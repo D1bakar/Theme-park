@@ -1,0 +1,30 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="Privacy — ThemePark"
+  description="ThemePark collects nothing. All settings stay on your device. No analytics, no network requests, no accounts."
+>
+  <h1 style="font-size: 2.2rem; margin-bottom: 8px;">Privacy</h1>
+  <p class="cta-note" style="margin-bottom: 24px;">Last updated: November 2026</p>
+
+  <div class="card" style="padding: 26px 28px;">
+    <p>
+      <strong>ThemePark collects nothing.</strong> It has no servers, no analytics, no accounts,
+      and makes no network requests of its own. Everything it does — themes, fonts, animation
+      settings, per-site profiles — is computed and stored locally in your browser using
+      Chrome's storage APIs.
+    </p>
+    <p>
+      The extension reads the pages you visit only to apply the visual settings you chose
+      (colors, fonts, motion). It never sends page content, URLs, or usage data anywhere.
+      There is no telemetry to opt out of, because there is no telemetry.
+    </p>
+    <p>
+      The website (this one) is static; it sets no cookies and performs no tracking. The
+      extension is open source — you can verify all of the above in the
+      <a href="https://github.com/D1bakar/Theme-park" rel="noopener">public repository</a>.
+    </p>
+  </div>
+</Base>

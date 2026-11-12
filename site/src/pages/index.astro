@@ -1,0 +1,100 @@
+---
+import Base from '../layouts/Base.astro';
+
+// Stable-download contract: the release workflow publishes EVERY version with
+// the asset name `ThemePark-chrome.zip`, so this URL never goes stale.
+// (If the asset is missing — e.g. before the first release — GitHub 404s;
+//  the release workflow in .github/workflows/release.yml is the guarantee.)
+const INSTALL_URL =
+  'https://github.com/D1bakar/Theme-park/releases/latest/download/ThemePark-chrome.zip';
+const RELEASES_URL = 'https://github.com/D1bakar/Theme-park/releases';
+
+const controls = [
+  {
+    title: 'Appearance',
+    body: 'Dark, light and AMOLED modes with custom accents — per site or everywhere. Real CSS variables, not an overlay filter.',
+  },
+  {
+    title: 'Smoothness',
+    body: 'One switch to calm every animation on the web. Honors your system reduced-motion setting by default.',
+  },
+  {
+    title: 'Readability',
+    body: 'Font, size, line-height and reading width for any article. High-contrast mode built in.',
+  },
+];
+
+const themes = [
+  { name: 'Paper', colors: ['#f3f1eb', '#171717', '#d7d2c4'] },
+  { name: 'Midnight', colors: ['#000000', '#ebebe9', '#3a3a3a'] },
+  { name: 'Liquid Glass', colors: ['#090b10', '#f5f5f7', 'rgba(255,255,255,0.14)'] },
+  { name: 'AMOLED', colors: ['#000000', '#000000', '#ffb000'] },
+];
+
+const steps = [
+  'Download the zip with the button above.',
+  'Unzip it anywhere you like — it is a plain folder.',
+  'Open <code>chrome://extensions</code>, enable <strong>Developer mode</strong>, then click <strong>Load unpacked</strong> and pick the folder.',
+];
+---
+
+<Base
+  title="ThemePark — total browsing customization for Chrome & Brave"
+  description="One extension for themes, smoothness and readability on every site. Per-site profiles, presets, keyboard shortcuts. All settings local — nothing leaves your device."
+>
+  <section class="hero">
+    <p class="eyebrow">Chrome · Brave · Manifest V3</p>
+    <h1>Total browsing customization, one extension.</h1>
+    <p class="hero-tagline">
+      Themes, fonts, reading width, animation control and per-site profiles — in one place.
+      Every setting stays on your device.
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href={INSTALL_URL} download>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"></path>
+        </svg>
+        Install ThemePark
+      </a>
+      <a class="btn btn-ghost" href="https://github.com/D1bakar/Theme-park" rel="noopener">View source</a>
+    </div>
+    <p class="cta-note">Free, open source. No account, no tracking, no data collection. <a href={RELEASES_URL} rel="noopener">All releases →</a></p>
+  </section>
+
+  <p class="section-label">Three controls. One place.</p>
+  <div class="grid-3">
+    {controls.map((c) => (
+      <article class="card">
+        <h3>{c.title}</h3>
+        <p>{c.body}</p>
+      </article>
+    ))}
+  </div>
+
+  <p class="section-label" id="install">Install in three steps</p>
+  <div class="card">
+    <ol class="steps">
+      {steps.map((s) => <li set:html={s} />)}
+    </ol>
+    <p style="margin: 14px 0 0; font-size: 13px;">
+      Works on Chrome and Brave (and most Chromium browsers). Not on Firefox or Safari yet.
+    </p>
+  </div>
+
+  <p class="section-label" id="themes">Theme packs</p>
+  <div class="grid-2">
+    {themes.map((t) => (
+      <article class="card">
+        <div class="swatch">
+          <div class="swatch-dots" aria-hidden="true">
+            {t.colors.map((c) => <span style={`background: ${c};`} />)}
+          </div>
+          <div>
+            <h3 style="margin-bottom: 2px;">{t.name}</h3>
+            <p style="font-size: 13.5px;">Pages + browser chrome. Ships with the extension.</p>
+          </div>
+        </div>
+      </article>
+    ))}
+  </div>
+</Base>

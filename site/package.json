@@ -1,0 +1,15 @@
+{
+  "name": "site",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "description": "ThemePark website — install, themes, privacy.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "^7.4.11"
+  }
+}
