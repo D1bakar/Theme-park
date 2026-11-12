@@ -1,0 +1,21 @@
+{
+  "name": "themepark",
+  "private": true,
+  "version": "0.0.0",
+  "description": "ThemePark — one extension for total browsing customization: themes, smoothness, readability. Chrome/Brave MV3.",
+  "license": "MIT",
+  "packageManager": "pnpm@12.18.0",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "ext:dev": "pnpm --filter extension dev",
+    "ext:build": "pnpm --filter extension build",
+    "ext:zip": "pnpm --filter extension zip",
+    "site:dev": "pnpm --filter site dev",
+    "site:build": "pnpm --filter site build",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck"
+  }
+}

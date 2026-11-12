@@ -1,0 +1,28 @@
+# dependencies & build output
+node_modules/
+dist/
+.astro/
+.output/
+.wxt/
+.vite/
+
+# packaged artifacts
+*.zip
+extension/.output/
+
+# env & secrets
+.env
+.env.*
+!.env.example
+
+# editor & OS
+.DS_Store
+*.swp
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# caches
+.turbo/
+.eslintcache
+coverage/
