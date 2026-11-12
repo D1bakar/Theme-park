@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import type { GlobalSettings } from './schema'
-import { buildGlassCss, buildThemeCss } from './theme-css'
+import { buildGlassCss, buildThemeCss, GLASS_SURFACES } from './theme-css'
 
 const base: GlobalSettings = {
   theme: 'auto',
@@ -96,27 +96,54 @@ describe('buildGlassCss', () => {
     expect(css).toContain('linear-gradient')
   })
 
+  it('wallpaper is Sonoma-style: layered soft glows over a blue→rose gradient', () => {
+    expect(css).toContain('radial-gradient')
+    // Gradient spans deep blue to warm rose, not the old cold hacker-dark.
+    expect(css).toContain('#22456e')
+    expect(css).toContain('#9a5b80')
+    expect(css).not.toContain('#0a0e18')
+  })
+
   it('frosts only body direct children and landmarks — never a blanket selector', () => {
     // The perf guard: every backdrop-filter rule must be scoped to the
     // bounded selector set. `*{...backdrop-filter` is the forbidden shape.
     expect(css).not.toMatch(/\*,[^{]*\{[^}]*backdrop-filter/)
     expect(css).toContain('body>div,body>main,body>header,body>footer,body>nav')
-    expect(css).toContain('backdrop-filter:blur(22px)')
+    expect(css).toContain('backdrop-filter:blur(30px)')
   })
 
-  it('includes specular highlight and glass border tokens', () => {
-    expect(css).toContain('inset 0 1px rgba(255,255,255,.28)')
-    expect(css).toContain('border-radius:18px')
+  it('covers framework app roots AND one level inside them', () => {
+    // React/Next/Vue/Gatsby bury the visible container under #root/#__next/
+    // #app/#___gatsby — this was the "glass half applied" root cause.
+    for (const root of ['#root', '#app', '#__next', '#___gatsby']) {
+      expect(css).toContain(`body>${root}`)
+      expect(css).toContain(`body>${root}>div`)
+    }
+    // The exported selector constant is used verbatim in the CSS.
+    expect(css).toContain(GLASS_SURFACES)
+  })
+
+  it('includes softer macOS tokens: 20px radius, whisper border, soft shadow', () => {
+    expect(css).toContain('border-radius:20px')
+    expect(css).toContain('border:1px solid var(--tp-glass-border)')
+    expect(css).toContain('0 8px 32px')
   })
 
   it('falls back to solid surfaces under prefers-reduced-transparency', () => {
     expect(css).toContain('prefers-reduced-transparency:reduce')
     expect(css).toContain('backdrop-filter:none')
+    expect(css).toContain('background-color:#322f4e!important')
   })
 
   it('adds buttery color transitions (composited-friendly properties only)', () => {
     expect(css).toContain('transition:background-color .35s')
     expect(css).not.toMatch(/transition:[^}]*\b(width|height|top|left)\b/)
+  })
+
+  it('stays small — the whole glass sheet must remain under ~2KB', () => {
+    // Injection-path perf budget (AGENTS.md): the compiler output is injected
+    // as one style tag on every page; runaway growth here is a regression.
+    expect(new TextEncoder().encode(css).length).toBeLessThan(2048)
   })
 })
 
