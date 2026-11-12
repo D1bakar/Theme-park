@@ -15,5 +15,11 @@ export default defineConfig({
     description:
       'Fine-grained control of site appearance, smoothness and readability — themes, fonts, animations, per-site profiles. All local, no data leaves your device.',
     permissions: ['storage'],
+    // Host permission justification (AGENTS.md requires written rationale):
+    // the product applies user-chosen styling to pages the user visits, and
+    // content scripts cannot match <all_urls> without the equivalent host
+    // permission. No other host access exists: no fetches, no webRequest,
+    // no data leaves the device. Rationale: docs/adr/0001-host-permissions.md.
+    host_permissions: ['<all_urls>'],
   },
 })
