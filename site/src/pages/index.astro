@@ -8,6 +8,8 @@ import Base from '../layouts/Base.astro';
 const INSTALL_URL =
   'https://github.com/D1bakar/Theme-park/releases/latest/download/ThemePark-chrome.zip';
 const RELEASES_URL = 'https://github.com/D1bakar/Theme-park/releases';
+const GLASS_THEME_URL =
+  'https://github.com/D1bakar/Theme-park/releases/latest/download/ThemePark-liquid-glass-theme.zip';
 
 const controls = [
   {
@@ -25,16 +27,27 @@ const controls = [
 ];
 
 const themes = [
-  { name: 'Paper', colors: ['#f3f1eb', '#171717', '#d7d2c4'] },
-  { name: 'Midnight', colors: ['#000000', '#ebebe9', '#3a3a3a'] },
-  { name: 'Liquid Glass', colors: ['#090b10', '#f5f5f7', 'rgba(255,255,255,0.14)'] },
-  { name: 'AMOLED', colors: ['#000000', '#000000', '#ffb000'] },
+  {
+    name: 'Liquid Glass',
+    colors: ['#0a0e18', '#f5f5f7', 'rgba(255,255,255,0.14)'],
+    desc: 'Frosted macOS-style glass for pages AND browser chrome.',
+    url: GLASS_THEME_URL,
+  },
+  { name: 'Paper', colors: ['#f3f1eb', '#171717', '#d7d2c4'], desc: 'Warm light theme.', url: null },
+  { name: 'Midnight', colors: ['#000000', '#ebebe9', '#3a3a3a'], desc: 'Classic dark.', url: null },
+  { name: 'AMOLED', colors: ['#000000', '#000000', '#ffb000'], desc: 'True black.', url: null },
 ];
 
 const steps = [
   'Download the zip with the button above.',
   'Unzip it anywhere you like — it is a plain folder.',
   'Open <code>chrome://extensions</code>, enable <strong>Developer mode</strong>, then click <strong>Load unpacked</strong> and pick the folder.',
+];
+
+const themeSteps = [
+  'Open <code>chrome://extensions</code> with Developer mode on.',
+  'Click <strong>Load unpacked</strong> and pick the unzipped theme folder.',
+  'Your tabs, toolbar and address bar are now glass. Pages: use the extension popup.',
 ];
 ---
 
@@ -89,12 +102,26 @@ const steps = [
           <div class="swatch-dots" aria-hidden="true">
             {t.colors.map((c) => <span style={`background: ${c};`} />)}
           </div>
-          <div>
+          <div style="min-width:0;">
             <h3 style="margin-bottom: 2px;">{t.name}</h3>
-            <p style="font-size: 13.5px;">Pages + browser chrome. Ships with the extension.</p>
+            <p style="font-size: 13.5px;">{t.desc}</p>
           </div>
         </div>
+        {t.url ? (
+          <a class="btn btn-ghost" style="margin-top: 12px; font-size: 13px; padding: 7px 14px;" href={t.url} download>
+            Download theme pack
+          </a>
+        ) : (
+          <p style="margin-top: 12px; font-size: 12.5px;" class="cta-note">Ships with the extension soon.</p>
+        )}
       </article>
     ))}
+  </div>
+
+  <p class="section-label">How to apply the browser theme</p>
+  <div class="card">
+    <ol class="steps">
+      {themeSteps.map((s) => <li set:html={s} />)}
+    </ol>
   </div>
 </Base>
