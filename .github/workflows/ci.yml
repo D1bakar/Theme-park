@@ -43,5 +43,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: themepark-extension
-          path: extension/.output/*.zip
+          path: extension/build/*.zip
           if-no-files-found: error

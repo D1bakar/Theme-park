@@ -5,6 +5,10 @@ import { defineConfig } from 'wxt'
 // Least privilege (AGENTS.md): storage only, for as long as that is enough.
 export default defineConfig({
   srcDir: 'src',
+  // Visible output dir — CI artifact upload globs can't match hidden
+  // directories like the default `.output`, and non-hidden paths are
+  // friendlier to tooling everywhere.
+  outDir: 'build',
   manifest: {
     name: 'ThemePark',
     short_name: 'ThemePark',

@@ -8,7 +8,7 @@ dist/
 
 # packaged artifacts
 *.zip
-extension/.output/
+extension/build/
 
 # env & secrets
 .env
