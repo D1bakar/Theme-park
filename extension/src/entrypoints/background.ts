@@ -6,5 +6,5 @@
 // code lands.
 export default defineBackground(() => {
   // eslint-disable-next-line no-console
-  console.log('[ThemePark] service worker started');
-});
+  console.log('[ThemePark] service worker started')
+})

@@ -1,4 +1,4 @@
-import { defineConfig } from 'wxt';
+import { defineConfig } from 'wxt'
 
 // The generated manifest. WXT fills in version, icons and entrypoint
 // wiring automatically; we only declare product identity and permissions.
@@ -12,4 +12,4 @@ export default defineConfig({
       'Fine-grained control of site appearance, smoothness and readability — themes, fonts, animations, per-site profiles. All local, no data leaves your device.',
     permissions: ['storage'],
   },
-});
+})

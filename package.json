@@ -14,8 +14,12 @@
     "ext:zip": "pnpm --filter extension zip",
     "site:dev": "pnpm --filter site dev",
     "site:build": "pnpm --filter site build",
-    "lint": "pnpm -r lint",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.6"
   }
 }
