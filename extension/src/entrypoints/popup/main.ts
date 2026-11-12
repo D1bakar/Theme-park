@@ -35,6 +35,8 @@ const lhValue = $<HTMLElement>('lh-value')
 const mwValue = $<HTMLElement>('mw-value')
 const anToggle = $('an-toggle')
 const anValue = $<HTMLElement>('an-value')
+const ftToggle = $('ft-toggle')
+const ftValue = $<HTMLElement>('ft-value')
 const warning = $('warning')
 const restrictedNotice = $('restricted-notice')
 
@@ -63,11 +65,17 @@ function renderAnimations(g: Settings['global']) {
   anValue.textContent = g.animations === 'off' ? 'Off' : 'Normal'
 }
 
+function renderFont(g: Settings['global']) {
+  ftToggle.setAttribute('aria-checked', String(g.font === 'mac'))
+  ftValue.textContent = g.font === 'mac' ? 'Inter' : 'Site'
+}
+
 function render(s: Settings) {
   current = s
   renderTheme(s.global.theme)
   renderTypography(s.global)
   renderAnimations(s.global)
+  renderFont(s.global)
 }
 
 async function apply(mutate: (s: Settings) => void) {
@@ -133,6 +141,13 @@ $('mw-inc').addEventListener('click', () =>
 anToggle.addEventListener('click', () =>
   apply((s) => {
     s.global.animations = s.global.animations === 'off' ? 'default' : 'off'
+  }),
+)
+
+// — macOS font switch —
+ftToggle.addEventListener('click', () =>
+  apply((s) => {
+    s.global.font = s.global.font === 'mac' ? 'site' : 'mac'
   }),
 )
 

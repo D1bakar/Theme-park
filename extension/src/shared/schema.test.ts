@@ -56,6 +56,20 @@ describe('normalizeSettings', () => {
     expect(out.global.animations).toBe('default')
   })
 
+  it('font mode defaults to mac and coerces garbage to mac', () => {
+    const missing = normalizeSettings({})
+    expect(missing.global.font).toBe('mac')
+    const garbage = normalizeSettings({ global: { font: 'comic-sans' } })
+    expect(garbage.global.font).toBe('mac')
+    const site = normalizeSettings({ global: { font: 'site' } })
+    expect(site.global.font).toBe('site')
+    // Profiles can override too.
+    const profiled = normalizeSettings({
+      sites: { 'a.com': { enabled: true, font: 'site' } },
+    })
+    expect(profiled.sites['a.com']?.font).toBe('site')
+  })
+
   it('keeps 0 as the explicit "leave site alone" value', () => {
     // 0 is meaningful (don't override), so clamping must NOT turn it into 40/1.0
     const out = normalizeSettings({ global: { lineHeight: 0, maxWidthCh: 0 } })

@@ -32,6 +32,7 @@ const sample: Settings = {
     maxWidthCh: 0,
     animations: 'default',
     smoothScroll: false,
+    font: 'mac',
   },
   sites: { 'example.com': { enabled: true, theme: 'light' } },
 }
