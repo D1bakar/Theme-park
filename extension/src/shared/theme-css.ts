@@ -28,28 +28,39 @@ const PALETTES: Record<Exclude<ThemeMode, 'auto' | 'glass'>, Palette> = {
 const clamp = (n: number, min: number, max: number): number => Math.min(max, Math.max(min, n))
 
 /**
- * Glass-mode CSS — iOS/macOS liquid-glass language: a fixed gradient
- * "wallpaper" behind the page, frosted translucent surfaces with backdrop
- * blur and specular highlights.
+ * Glass-mode CSS — macOS Sonoma liquid-glass language: a soft blue→purple→
+ * pink gradient "wallpaper" behind the page, frosted translucent surfaces
+ * with backdrop blur, vibrancy saturate and specular highlights.
  *
- * PERF GUARD: backdrop-filter applies ONLY to body's direct children and
- * landmarks — a bounded set (usually < 15 elements). Never a blanket
- * `*` selector; unbounded backdrop-filter melts complex pages and blows
- * the perf budget (AGENTS.md).
+ * PERF GUARD: backdrop-filter applies ONLY to body's direct children,
+ * landmarks, and known framework app roots (plus one level inside them) —
+ * a bounded set (usually < 25 elements). React/Next/Vue/Gatsby bury the
+ * visible container under #root/#__next/#app/#___gatsby, so covering those
+ * is the difference between "half applied" and "actually applied".
+ * Never a blanket `*` selector; unbounded backdrop-filter melts complex
+ * pages and blows the perf budget (AGENTS.md).
  */
+export const GLASS_SURFACES =
+  'body>div,body>main,body>header,body>footer,body>nav,body>section,body>article,body>aside,' +
+  'body>#root,body>#app,body>#__next,body>#___gatsby,' +
+  'body>#root>div,body>#app>div,body>#__next>div,body>#___gatsby>div'
+
 export function buildGlassCss(): string {
   return [
-    ':root{--tp-fg:#f5f5f7;--tp-glass:rgba(255,255,255,.055);--tp-glass-border:rgba(255,255,255,.14)}',
+    ':root{--tp-fg:#f5f5f7;--tp-glass:rgba(255,255,255,.06);--tp-glass-border:rgba(255,255,255,.12)}',
     'html,body{background:transparent!important;color:var(--tp-fg)!important}',
     'html{color-scheme:dark}',
-    // Wallpaper sits under all content; `fixed` keeps it stable on scroll.
-    'body::before{content:"";position:fixed;inset:0;z-index:-2;background:linear-gradient(160deg,#0a0e18,#141b2e 45%,#1b1030)}',
-    // Frosted surfaces: bounded selector set (direct children + landmarks).
-    'body>div,body>main,body>header,body>footer,body>nav,body>section,body>article,body>aside{background-color:var(--tp-glass)!important;backdrop-filter:blur(22px) saturate(1.4);-webkit-backdrop-filter:blur(22px) saturate(1.4);border:1px solid var(--tp-glass-border);border-radius:18px;box-shadow:inset 0 1px rgba(255,255,255,.28),inset 0 -1px rgba(255,255,255,.05)}',
+    // Sonoma-style wallpaper: base diagonal gradient + two soft light glows
+    // (cool blue top-left, warm pink bottom-right). `fixed` keeps it stable
+    // on scroll; it sits under all content via z-index:-2.
+    'body::before{content:"";position:fixed;inset:0;z-index:-2;background:radial-gradient(120% 90% at 12% 8%,rgba(96,148,224,.42),transparent 60%),radial-gradient(110% 85% at 88% 92%,rgba(236,124,180,.30),transparent 58%),linear-gradient(165deg,#22456e,#3c3a72 38%,#6f4a7e 68%,#9a5b80)}',
+    // Frosted surfaces: bounded selector set (framework-aware, see above).
+    `${GLASS_SURFACES}{background-color:var(--tp-glass)!important;backdrop-filter:blur(30px) saturate(1.5);-webkit-backdrop-filter:blur(30px) saturate(1.5);border:1px solid var(--tp-glass-border);border-radius:20px;box-shadow:inset 0 1px rgba(255,255,255,.24),inset 0 -1px rgba(255,255,255,.04),0 8px 32px rgba(10,14,26,.35)}`,
     // Buttery: gentle color transitions, composited properties only.
     'body>div,body>main,body>header,body>footer,body>nav{transition:background-color .35s cubic-bezier(.32,.72,0,1),color .35s cubic-bezier(.32,.72,0,1)}',
-    // A11y: OS-level "less transparency" preference gets solid glass.
-    '@media (prefers-reduced-transparency:reduce){body>div,body>main,body>header,body>footer,body>nav,body>section,body>article,body>aside{background-color:#12141c!important;backdrop-filter:none;-webkit-backdrop-filter:none}}',
+    // A11y: OS-level "less transparency" preference gets a solid tone
+    // matching the wallpaper's mid gradient.
+    `@media (prefers-reduced-transparency:reduce){${GLASS_SURFACES}{background-color:#322f4e!important;backdrop-filter:none;-webkit-backdrop-filter:none}}`,
   ].join('')
 }
 
