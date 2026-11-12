@@ -1,0 +1,17 @@
+{
+  "name": "extension",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "description": "ThemePark extension — themes, smoothness and readability control for the web (Chrome/Brave MV3).",
+  "scripts": {
+    "dev": "wxt",
+    "build": "wxt build",
+    "zip": "wxt zip",
+    "typecheck": "wxt prepare && tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "wxt": "^0.21.5"
+  }
+}
