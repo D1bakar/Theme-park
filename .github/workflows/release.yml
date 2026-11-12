@@ -43,7 +43,7 @@ jobs:
       - name: Package with stable asset name
         run: |
           pnpm --filter extension zip
-          cp extension/.output/extension-*-chrome.zip ThemePark-chrome.zip
+          cp extension/build/extension-*-chrome.zip ThemePark-chrome.zip
           ls -la ThemePark-chrome.zip
 
       - name: Publish GitHub Release
