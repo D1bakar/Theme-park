@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "ThemePark — Liquid Glass",
+  "version": "1.0.0",
+  "description": "Companion browser-chrome theme for the ThemePark extension: frosted translucent surfaces over a deep gradient base. Static by design — browser UI cannot be scripted.",
+  "theme": {
+    "colors": {
+      "frame": [10, 14, 24],
+      "frame_inactive": [8, 10, 18],
+      "frame_incognito": [10, 14, 24],
+      "frame_incognito_inactive": [8, 10, 18],
+      "background_tab": [14, 18, 30],
+      "background_tab_inactive": [12, 15, 26],
+      "background_tab_text": [138, 138, 133],
+      "toolbar": [255, 255, 255, 14],
+      "toolbar_button_icon": [200, 203, 210],
+      "toolbar_text": [245, 245, 247],
+      "bookmark_text": [245, 245, 247],
+      "tab_background_text": [138, 138, 133],
+      "tab_text": [245, 245, 247],
+      "omnibox_background": [255, 255, 255, 18],
+      "omnibox_text": [245, 245, 247],
+      "ntp_background": [10, 14, 24],
+      "ntp_text": [245, 245, 247],
+      "ntp_link": [125, 180, 255],
+      "button_background": [255, 255, 255, 18]
+    },
+    "tints": {
+      "buttons": [-1, -1, 0.75],
+      "frame_inactive": [-1, -1, 0.9],
+      "background_tab": [-1, -1, 0.9]
+    },
+    "properties": {
+      "ntp_background_alignment": "bottom",
+      "ntp_logo_alternate": 1
+    }
+  }
+}

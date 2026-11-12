@@ -44,10 +44,27 @@ jobs:
         run: |
           pnpm --filter extension zip
           cp extension/build/extension-*-chrome.zip ThemePark-chrome.zip
-          ls -la ThemePark-chrome.zip
+          # Theme packs: one zip per directory, stable name = folder name.
+          # python zipfile — available on all runners, unlike `zip`.
+          python3 - <<'PY'
+          import zipfile, pathlib
+          out = pathlib.Path('theme-assets'); out.mkdir(exist_ok=True)
+          for d in pathlib.Path('themes').iterdir():
+              if not (d / 'manifest.json').is_file():
+                  continue
+              zpath = out / f'ThemePark-{d.name}-theme.zip'
+              with zipfile.ZipFile(zpath, 'w', zipfile.ZIP_DEFLATED) as z:
+                  for f in sorted(d.rglob('*')):
+                      if f.is_file():
+                          z.write(f, f.relative_to(d))
+              print('zipped', zpath)
+          PY
+          ls -la ThemePark-chrome.zip theme-assets/
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ThemePark-chrome.zip
+          files: |
+            ThemePark-chrome.zip
+            theme-assets/*.zip
           generate_release_notes: true
