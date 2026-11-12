@@ -10,7 +10,7 @@
  */
 
 /** User-facing theme mode. `auto` follows prefers-color-scheme. */
-export type ThemeMode = 'auto' | 'light' | 'dark' | 'amoled'
+export type ThemeMode = 'auto' | 'light' | 'dark' | 'amoled' | 'glass'
 
 /** Animation control. `default` = touch nothing; `off` = kill all. */
 export type AnimationMode = 'default' | 'off'
@@ -62,7 +62,7 @@ export const DEFAULT_SETTINGS: Settings = {
   sites: {},
 }
 
-const THEME_MODES: ThemeMode[] = ['auto', 'light', 'dark', 'amoled']
+const THEME_MODES: ThemeMode[] = ['auto', 'light', 'dark', 'amoled', 'glass']
 const ANIMATION_MODES: AnimationMode[] = ['default', 'off']
 
 const clamp = (n: number, min: number, max: number): number => Math.min(max, Math.max(min, n))

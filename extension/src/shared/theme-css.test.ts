@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import type { GlobalSettings } from './schema'
-import { buildThemeCss } from './theme-css'
+import { buildGlassCss, buildThemeCss } from './theme-css'
 
 const base: GlobalSettings = {
   theme: 'auto',
@@ -12,7 +12,7 @@ const base: GlobalSettings = {
   smoothScroll: false,
 }
 
-describe('buildThemeCss', () => {
+describe('buildThemeCss — original contract', () => {
   it('returns null for untouched defaults — inject nothing', () => {
     expect(buildThemeCss(base)).toBeNull()
   })
@@ -85,5 +85,73 @@ describe('buildThemeCss', () => {
   it('always returns ONE string — the single style tag contract', () => {
     const css = buildThemeCss({ ...base, theme: 'dark', fontSize: 120, smoothScroll: true })
     expect(typeof css).toBe('string')
+  })
+})
+
+describe('buildGlassCss', () => {
+  const css = buildGlassCss()
+
+  it('sets a fixed gradient wallpaper via body::before', () => {
+    expect(css).toContain('body::before{content:"";position:fixed;inset:0;z-index:-2')
+    expect(css).toContain('linear-gradient')
+  })
+
+  it('frosts only body direct children and landmarks — never a blanket selector', () => {
+    // The perf guard: every backdrop-filter rule must be scoped to the
+    // bounded selector set. `*{...backdrop-filter` is the forbidden shape.
+    expect(css).not.toMatch(/\*,[^{]*\{[^}]*backdrop-filter/)
+    expect(css).toContain('body>div,body>main,body>header,body>footer,body>nav')
+    expect(css).toContain('backdrop-filter:blur(22px)')
+  })
+
+  it('includes specular highlight and glass border tokens', () => {
+    expect(css).toContain('inset 0 1px rgba(255,255,255,.28)')
+    expect(css).toContain('border-radius:18px')
+  })
+
+  it('falls back to solid surfaces under prefers-reduced-transparency', () => {
+    expect(css).toContain('prefers-reduced-transparency:reduce')
+    expect(css).toContain('backdrop-filter:none')
+  })
+
+  it('adds buttery color transitions (composited-friendly properties only)', () => {
+    expect(css).toContain('transition:background-color .35s')
+    expect(css).not.toMatch(/transition:[^}]*\b(width|height|top|left)\b/)
+  })
+})
+
+describe('buildThemeCss — glass integration', () => {
+  it('glass mode emits glass CSS and dark color-scheme, no solid palette vars', () => {
+    const css = buildThemeCss({ ...base, theme: 'glass' }) ?? ''
+    expect(css).toContain('body::before')
+    expect(css).toContain('color-scheme:dark')
+    expect(css).not.toContain('--tp-bg:')
+  })
+
+  it('glass + typography stack correctly (single string, all rules)', () => {
+    const css = buildThemeCss({ ...base, theme: 'glass', fontSize: 130, lineHeight: 1.6 }) ?? ''
+    expect(css).toContain('font-size:130%')
+    expect(css).toContain('line-height:1.6!important')
+    expect(css).toContain('body::before')
+  })
+})
+
+describe('buildThemeCss — stronger typography', () => {
+  it('font size hits BOTH :root (rem sites) and body !important (inherit sites)', () => {
+    const css = buildThemeCss({ ...base, fontSize: 120 }) ?? ''
+    expect(css).toContain('html{font-size:120%}')
+    expect(css).toContain('body{font-size:120%!important}')
+  })
+
+  it('line-height is emitted with !important so site CSS cannot silently win', () => {
+    const css = buildThemeCss({ ...base, lineHeight: 1.7 }) ?? ''
+    expect(css).toContain('body{line-height:1.7!important}')
+  })
+
+  it('normal modes still behave as before (no glass leakage)', () => {
+    const css = buildThemeCss({ ...base, theme: 'dark', fontSize: 110 }) ?? ''
+    expect(css).toContain('--tp-bg:#121212')
+    expect(css).not.toContain('body::before')
+    expect(css).toContain('body{font-size:110%!important}')
   })
 })
