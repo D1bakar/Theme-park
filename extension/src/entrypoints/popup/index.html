@@ -2,18 +2,76 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="color-scheme" content="light dark" />
     <title>ThemePark</title>
-    <style>
-      body {
-        width: 280px;
-        margin: 0;
-        font-family: system-ui, sans-serif;
-      }
-    </style>
+    <link rel="stylesheet" href="./popup.css" />
   </head>
   <body>
-    <h1>ThemePark</h1>
-    <p>MVP popup placeholder.</p>
+    <header class="head">
+      <span class="logo">ThemePark</span>
+    </header>
+
+    <p id="restricted-notice" class="notice" hidden>
+      This page can't be styled — settings still apply everywhere else.
+    </p>
+
+    <main>
+      <section aria-label="Theme">
+        <h2 id="theme-label">Theme</h2>
+        <div class="segments" role="group" aria-labelledby="theme-label" id="theme-segments">
+          <button type="button" data-theme="auto" aria-pressed="false">Auto</button>
+          <button type="button" data-theme="light" aria-pressed="false">Light</button>
+          <button type="button" data-theme="dark" aria-pressed="false">Dark</button>
+          <button type="button" data-theme="amoled" aria-pressed="false">AMOLED</button>
+        </div>
+      </section>
+
+      <section aria-label="Typography">
+        <div class="row">
+          <span class="row-label" id="fs-label">Text size</span>
+          <span class="value" id="fs-value" aria-hidden="true"></span>
+          <span class="stepper">
+            <button type="button" id="fs-dec" aria-label="Decrease text size">−</button>
+            <button type="button" id="fs-inc" aria-label="Increase text size">+</button>
+          </span>
+        </div>
+
+        <div class="row">
+          <span class="row-label" id="lh-label">Line height</span>
+          <span class="value" id="lh-value" aria-hidden="true"></span>
+          <span class="stepper">
+            <button type="button" id="lh-dec" aria-label="Decrease line height">−</button>
+            <button type="button" id="lh-inc" aria-label="Increase line height">+</button>
+          </span>
+        </div>
+
+        <div class="row">
+          <span class="row-label" id="mw-label">Reading width</span>
+          <span class="value" id="mw-value" aria-hidden="true"></span>
+          <span class="stepper">
+            <button type="button" id="mw-dec" aria-label="Decrease reading width">−</button>
+            <button type="button" id="mw-inc" aria-label="Increase reading width">+</button>
+          </span>
+        </div>
+      </section>
+
+      <section aria-label="Motion">
+        <div class="row">
+          <span class="row-label" id="an-label">Animations</span>
+          <span class="value" id="an-value" aria-hidden="true"></span>
+          <button type="button" id="an-toggle" class="switch" role="switch" aria-labelledby="an-label" aria-checked="false"></button>
+        </div>
+      </section>
+
+      <footer>
+        <button type="button" id="advanced" class="advanced" disabled title="Options page ships in M2">
+          ⚙ Advanced <span class="soon">soon</span>
+        </button>
+      </footer>
+    </main>
+
+    <p id="warning" class="warning" hidden role="alert"></p>
+
     <script type="module" src="./main.ts"></script>
   </body>
 </html>
