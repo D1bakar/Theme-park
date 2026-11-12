@@ -1,0 +1,239 @@
+/* Popup styles — tokens mirror the website's paper/dark system.
+   Light follows the site default; dark via prefers-color-scheme (popup
+   inherits the OS/browser scheme, honoring user choice without JS). */
+
+:root {
+  --bg: #f3f1eb;
+  --bg-card: #f8f6f0;
+  --text: #171717;
+  --text-secondary: #3a3730;
+  --text-tertiary: #6b6558;
+  --border: #d7d2c4;
+  --hover-bg: rgba(23, 23, 23, 0.05);
+  --accent: rgba(23, 23, 23, 0.07);
+  --radius: 10px;
+  --transition: 0.18s cubic-bezier(0.32, 0.72, 0, 1);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b0b0b;
+    --bg-card: #141414;
+    --text: #ebebe9;
+    --text-secondary: #b8b8b4;
+    --text-tertiary: #8a8a85;
+    --border: rgba(235, 235, 233, 0.13);
+    --hover-bg: rgba(235, 235, 233, 0.05);
+    --accent: rgba(235, 235, 233, 0.08);
+    color-scheme: dark;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 300px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-size: 13.5px;
+  line-height: 1.5;
+  background: var(--bg);
+  color: var(--text);
+  padding: 14px 16px 12px;
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.logo {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+
+.notice {
+  font-size: 12.5px;
+  color: var(--text-tertiary);
+  background: var(--accent);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  margin-bottom: 10px;
+}
+
+h2 {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 6px;
+}
+
+section {
+  margin-bottom: 12px;
+}
+
+.segments {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+.segments button {
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 7px 0;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background var(--transition),
+    color var(--transition),
+    border-color var(--transition);
+}
+.segments button:hover {
+  background: var(--hover-bg);
+  color: var(--text);
+}
+.segments button[aria-pressed='true'] {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+}
+.row-label {
+  flex: 1;
+  color: var(--text-secondary);
+}
+.value {
+  min-width: 74px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-tertiary);
+  font-size: 12.5px;
+}
+.stepper {
+  display: flex;
+  gap: 4px;
+}
+.stepper button {
+  width: 26px;
+  height: 26px;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background var(--transition),
+    color var(--transition),
+    border-color var(--transition);
+}
+.stepper button:hover {
+  background: var(--hover-bg);
+  color: var(--text);
+}
+
+.switch {
+  width: 36px;
+  height: 20px;
+  flex: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-card);
+  cursor: pointer;
+  position: relative;
+  transition: background var(--transition), border-color var(--transition);
+}
+.switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--text-tertiary);
+  transition: transform var(--transition), background var(--transition);
+}
+.switch[aria-checked='true'] {
+  background: var(--text);
+  border-color: var(--text);
+}
+.switch[aria-checked='true']::after {
+  transform: translateX(16px);
+  background: var(--bg);
+}
+
+footer {
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+  padding-top: 10px;
+}
+.advanced {
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  background: none;
+  border: none;
+  cursor: default;
+  padding: 2px 0;
+}
+.advanced .soon {
+  font-size: 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 1px 6px;
+  margin-left: 2px;
+}
+
+.warning {
+  font-size: 12px;
+  color: #b42318;
+  margin-top: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  .warning {
+    color: #ff8a80;
+  }
+}
+
+/* Focus visibility — a11y is not optional (AGENTS.md) */
+:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
