@@ -26,3 +26,4 @@ extension/build/
 .turbo/
 .eslintcache
 coverage/
+Cached Theme.pak
