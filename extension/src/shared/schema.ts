@@ -9,20 +9,18 @@
  * - Never duplicate these types elsewhere. Import from here.
  */
 
-/** User-facing theme mode. `auto` follows prefers-color-scheme. */
-export type ThemeMode = 'auto' | 'light' | 'dark' | 'amoled' | 'glass'
+/**
+ * The product is ONE theme: AMOLED anti-reflective dark.
+ * `auto` = power switch OFF (the site's own scheme wins).
+ * Legacy stored modes (glass/light/dark) normalize to the default.
+ */
+export type ThemeMode = 'auto' | 'amoled'
 
 /** Animation control. `default` = touch nothing; `off` = kill all. */
 export type AnimationMode = 'default' | 'off'
 
-/**
- * Typography. `mac` = bundle Inter (OFL) and set the macOS-style stack on
- * every page; `site` = leave the site's own font alone.
- */
-export type FontMode = 'site' | 'mac'
-
 export interface GlobalSettings {
-  /** Global color scheme applied to every page without a site profile. */
+  /** The theme (AMOLED on / off). */
   theme: ThemeMode
   /** Base font size for body text, in percent of the site's own. 80–200. */
   fontSize: number
@@ -34,8 +32,8 @@ export interface GlobalSettings {
   animations: AnimationMode
   /** Force scroll-behavior: smooth on the document element. */
   smoothScroll: boolean
-  /** macOS-style typography (Inter) or the site's own font. */
-  font: FontMode
+  /** Pull images down to ~82% brightness — the anti-glare of antireflective. */
+  dimImages: boolean
 }
 
 /**
@@ -56,13 +54,13 @@ export interface Settings {
 }
 
 export const DEFAULT_GLOBAL_SETTINGS: GlobalSettings = {
-  theme: 'amoled', // the one flagship theme — anti-reflective dark, out of the box
+  theme: 'amoled', // the one theme — ON out of the box
   fontSize: 100,
   lineHeight: 0, // 0 = leave site's own line-height alone
   maxWidthCh: 0, // 0 = leave site's own width alone
   animations: 'default',
   smoothScroll: false,
-  font: 'mac', // typography is half the macOS feel — on by default
+  dimImages: true, // antireflective: images are the biggest glare source
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -71,9 +69,8 @@ export const DEFAULT_SETTINGS: Settings = {
   sites: {},
 }
 
-const THEME_MODES: ThemeMode[] = ['auto', 'light', 'dark', 'amoled', 'glass']
+const THEME_MODES: ThemeMode[] = ['auto', 'amoled']
 const ANIMATION_MODES: AnimationMode[] = ['default', 'off']
-const FONT_MODES: FontMode[] = ['site', 'mac']
 
 const clamp = (n: number, min: number, max: number): number => Math.min(max, Math.max(min, n))
 
@@ -123,7 +120,7 @@ export function normalizeSettings(input: unknown): Settings {
       if (typeof p.animations === 'string')
         profile.animations = oneOf(p.animations, ANIMATION_MODES, 'default')
       if (typeof p.smoothScroll === 'boolean') profile.smoothScroll = p.smoothScroll
-      if (typeof p.font === 'string') profile.font = oneOf(p.font, FONT_MODES, 'mac')
+      if (typeof p.dimImages === 'boolean') profile.dimImages = p.dimImages
       sites[host] = profile
     }
   }
@@ -143,10 +140,7 @@ export function normalizeSettings(input: unknown): Settings {
           ? oneOf(global.animations, ANIMATION_MODES, 'default')
           : 'default',
       smoothScroll: global.smoothScroll === true,
-      font:
-        typeof global.font === 'string'
-          ? oneOf(global.font, FONT_MODES, 'mac')
-          : DEFAULT_GLOBAL_SETTINGS.font,
+      dimImages: global.dimImages !== false, // default ON; only explicit false turns it off
     },
     sites,
   }

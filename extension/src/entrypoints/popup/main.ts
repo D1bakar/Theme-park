@@ -1,10 +1,13 @@
 /**
- * Popup logic. Contains NO business rules: steppers/segments only transform
+ * Popup logic. Contains NO business rules: switch/steppers only transform
  * values with UI-constant steps and hand them to the settings store, which
  * normalizes + clamps (schema is the single source of truth).
+ *
+ * The product is ONE theme: AMOLED anti-reflective. The popup is a power
+ * switch + comfort controls. Nothing else.
  */
 
-import type { Settings, ThemeMode } from '@/shared/schema'
+import type { Settings } from '@/shared/schema'
 import { getSettingsStore } from '@/shared/storage'
 
 const FS_STEP = 5
@@ -29,23 +32,24 @@ const RESTRICTED_PREFIXES = [
   'https://chromewebstore.google.com',
 ]
 
-const themeButtons = document.querySelectorAll<HTMLButtonElement>('#theme-segments button')
+const pwToggle = $('pw-toggle')
+const pwValue = $<HTMLElement>('pw-value')
 const fsValue = $<HTMLElement>('fs-value')
 const lhValue = $<HTMLElement>('lh-value')
 const mwValue = $<HTMLElement>('mw-value')
+const dmToggle = $('dm-toggle')
+const dmValue = $<HTMLElement>('dm-value')
 const anToggle = $('an-toggle')
 const anValue = $<HTMLElement>('an-value')
-const ftToggle = $('ft-toggle')
-const ftValue = $<HTMLElement>('ft-value')
 const warning = $('warning')
 const restrictedNotice = $('restricted-notice')
 
 let current: Settings | null = null
 
-function renderTheme(theme: ThemeMode) {
-  themeButtons.forEach((btn) => {
-    btn.setAttribute('aria-pressed', String(btn.dataset.theme === theme))
-  })
+function renderPower(g: Settings['global']) {
+  const on = g.theme === 'amoled'
+  pwToggle.setAttribute('aria-checked', String(on))
+  pwValue.textContent = on ? 'On' : 'Off'
 }
 
 function renderTypography(g: Settings['global']) {
@@ -60,22 +64,18 @@ function renderTypography(g: Settings['global']) {
   $('mw-inc').toggleAttribute('disabled', g.maxWidthCh >= 100)
 }
 
-function renderAnimations(g: Settings['global']) {
+function renderGlare(g: Settings['global']) {
+  dmToggle.setAttribute('aria-checked', String(g.dimImages))
+  dmValue.textContent = g.dimImages ? 'Dim' : 'Full'
   anToggle.setAttribute('aria-checked', String(g.animations === 'off'))
   anValue.textContent = g.animations === 'off' ? 'Off' : 'Normal'
 }
 
-function renderFont(g: Settings['global']) {
-  ftToggle.setAttribute('aria-checked', String(g.font === 'mac'))
-  ftValue.textContent = g.font === 'mac' ? 'Inter' : 'Site'
-}
-
 function render(s: Settings) {
   current = s
-  renderTheme(s.global.theme)
+  renderPower(s.global)
   renderTypography(s.global)
-  renderAnimations(s.global)
-  renderFont(s.global)
+  renderGlare(s.global)
 }
 
 async function apply(mutate: (s: Settings) => void) {
@@ -92,14 +92,12 @@ async function apply(mutate: (s: Settings) => void) {
   }
 }
 
-// — segments —
-themeButtons.forEach((btn) => {
-  btn.addEventListener('click', () =>
-    apply((s) => {
-      s.global.theme = btn.dataset.theme as ThemeMode
-    }),
-  )
-})
+// — power switch (AMOLED on / site's own scheme) —
+pwToggle.addEventListener('click', () =>
+  apply((s) => {
+    s.global.theme = s.global.theme === 'amoled' ? 'auto' : 'amoled'
+  }),
+)
 
 // — steppers —
 $('fs-dec').addEventListener('click', () =>
@@ -137,17 +135,17 @@ $('mw-inc').addEventListener('click', () =>
   }),
 )
 
+// — dim images switch (the antireflective in antireflective) —
+dmToggle.addEventListener('click', () =>
+  apply((s) => {
+    s.global.dimImages = !s.global.dimImages
+  }),
+)
+
 // — animations switch —
 anToggle.addEventListener('click', () =>
   apply((s) => {
     s.global.animations = s.global.animations === 'off' ? 'default' : 'off'
-  }),
-)
-
-// — macOS font switch —
-ftToggle.addEventListener('click', () =>
-  apply((s) => {
-    s.global.font = s.global.font === 'mac' ? 'site' : 'mac'
   }),
 )
 

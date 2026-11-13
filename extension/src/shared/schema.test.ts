@@ -15,25 +15,27 @@ describe('normalizeSettings', () => {
     const input = {
       version: 1,
       global: {
-        theme: 'dark',
+        theme: 'amoled',
         fontSize: 120,
         lineHeight: 1.6,
         maxWidthCh: 70,
         animations: 'off',
         smoothScroll: true,
+        dimImages: false,
       },
       sites: {
-        'example.com': { enabled: true, theme: 'light', fontSize: 90 },
+        'example.com': { enabled: true, theme: 'auto', fontSize: 90 },
       },
     }
     const out = normalizeSettings(input)
-    expect(out.global.theme).toBe('dark')
+    expect(out.global.theme).toBe('amoled')
     expect(out.global.fontSize).toBe(120)
     expect(out.global.lineHeight).toBe(1.6)
     expect(out.global.maxWidthCh).toBe(70)
     expect(out.global.animations).toBe('off')
     expect(out.global.smoothScroll).toBe(true)
-    expect(out.sites['example.com']).toEqual({ enabled: true, theme: 'light', fontSize: 90 })
+    expect(out.global.dimImages).toBe(false)
+    expect(out.sites['example.com']).toEqual({ enabled: true, theme: 'auto', fontSize: 90 })
   })
 
   it('clamps out-of-range numbers instead of rejecting them', () => {
@@ -52,8 +54,15 @@ describe('normalizeSettings', () => {
     const out = normalizeSettings({
       global: { theme: 'neon-pink', animations: 'sometimes' },
     })
-    expect(out.global.theme).toBe('amoled') // flagship default, not adjacent mode
+    expect(out.global.theme).toBe('amoled') // default, not adjacent mode
     expect(out.global.animations).toBe('default')
+  })
+
+  it('legacy theme modes normalize to the single-theme default', () => {
+    // Pre-pivot storage may hold glass/light/dark — those modes no longer
+    // exist, so they normalize to the product's one theme.
+    const legacy = normalizeSettings({ global: { theme: 'glass' } })
+    expect(legacy.global.theme).toBe('amoled')
   })
 
   it('amoled is the default theme for fresh installs and garbage input', () => {
@@ -64,18 +73,15 @@ describe('normalizeSettings', () => {
     expect(profiled.sites['a.com']?.theme).toBe('amoled')
   })
 
-  it('font mode defaults to mac and coerces garbage to mac', () => {
-    const missing = normalizeSettings({})
-    expect(missing.global.font).toBe('mac')
-    const garbage = normalizeSettings({ global: { font: 'comic-sans' } })
-    expect(garbage.global.font).toBe('mac')
-    const site = normalizeSettings({ global: { font: 'site' } })
-    expect(site.global.font).toBe('site')
-    // Profiles can override too.
-    const profiled = normalizeSettings({
-      sites: { 'a.com': { enabled: true, font: 'site' } },
-    })
-    expect(profiled.sites['a.com']?.font).toBe('site')
+  it('dimImages defaults to ON and only explicit false turns it off', () => {
+    expect(normalizeSettings({}).global.dimImages).toBe(true)
+    expect(normalizeSettings({ global: { dimImages: 'no' } }).global.dimImages).toBe(true)
+    expect(normalizeSettings({ global: { dimImages: false } }).global.dimImages).toBe(false)
+  })
+
+  it('unknown legacy fields are dropped silently (font was removed in the pivot)', () => {
+    const out = normalizeSettings({ global: { font: 'mac' } })
+    expect('font' in out.global).toBe(false)
   })
 
   it('keeps 0 as the explicit "leave site alone" value', () => {

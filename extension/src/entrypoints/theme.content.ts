@@ -6,21 +6,16 @@
  *   then only textContent is swapped on changes
  * - live restyle via storage watch — toggles apply without page reload
  *
- * Known limitation, tracked in a follow-up issue: first application is an
- * async storage read, so a brief flash of the site's own theme is possible
- * on cold navigation. Fix (SW-cached sync read) comes next.
+ * Anti-flash (issue #10): the product default is AMOLED on, so a
+ * synchronous black guess is painted on <html> at document_start — before
+ * any async storage read can resolve. Cold navigations therefore never
+ * flash white. The guess is reconciled the moment real settings arrive:
+ * if the theme is on, the stylesheet covers it and the guess is cleared;
+ * if off, the guess is cleared and the site's own look returns.
  */
 
-import fontW400 from '@/shared/fonts/inter-400.woff2?inline'
-import fontW500 from '@/shared/fonts/inter-500.woff2?inline'
-import fontW600 from '@/shared/fonts/inter-600.woff2?inline'
 import { getSettingsStore } from '@/shared/storage'
 import { buildThemeCss } from '@/shared/theme-css'
-
-// Inter (OFL) is bundled as data URIs: zero network requests (AGENTS.md),
-// no web_accessible_resources needed. ~72KB total; only the @font-face
-// entries appear in CSS when the user's font mode is 'mac'.
-const FONT_ASSETS = { w400: fontW400, w500: fontW500, w600: fontW600 }
 
 export default defineContentScript({
   matches: ['<all_urls>'],
@@ -28,14 +23,21 @@ export default defineContentScript({
   main() {
     let styleEl: HTMLStyleElement | undefined
 
+    const docEl = document.documentElement
+    docEl.style.backgroundColor = '#000'
+    const clearGuess = () => {
+      docEl.style.backgroundColor = ''
+    }
+
     const apply = async () => {
       try {
         const settings = await getSettingsStore().load()
-        const css = buildThemeCss(settings.global, FONT_ASSETS)
+        const css = buildThemeCss(settings.global)
 
         if (css === null) {
           styleEl?.remove()
           styleEl = undefined
+          clearGuess() // power switch is off — give the page back its own look
           return
         }
 
@@ -45,9 +47,11 @@ export default defineContentScript({
           ;(document.head ?? document.documentElement).appendChild(styleEl)
         }
         styleEl.textContent = css
+        clearGuess() // stylesheet now owns the colors (html bg is in the CSS)
       } catch (error) {
         // Restricted pages (chrome://, etc.) can throw in unexpected ways —
         // degrade gracefully, never break the host page (AGENTS.md).
+        clearGuess()
         console.warn('[ThemePark] theme apply skipped:', error)
       }
     }
