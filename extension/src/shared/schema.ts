@@ -19,6 +19,17 @@ export type ThemeMode = 'auto' | 'amoled'
 /** Animation control. `default` = touch nothing; `off` = kill all. */
 export type AnimationMode = 'default' | 'off'
 
+/**
+ * Glare compensation mode. External light adds a veil over everything; the
+ * text/hairline luminance must rise (sunlight) or fall (night) to stay
+ * legible against it. `auto` = ambient light sensor when the browser
+ * exposes one, local-time fallback otherwise.
+ */
+export type GlareMode = 'auto' | 'night' | 'indoor' | 'sunlight'
+
+/** The resolved glare level actually compiled into CSS (never `auto`). */
+export type ResolvedGlare = 'night' | 'indoor' | 'sunlight'
+
 export interface GlobalSettings {
   /** The theme (AMOLED on / off). */
   theme: ThemeMode
@@ -34,6 +45,8 @@ export interface GlobalSettings {
   smoothScroll: boolean
   /** Pull images down to ~82% brightness — the anti-glare of antireflective. */
   dimImages: boolean
+  /** Text luminance for the light around the screen. Default: auto. */
+  glare: GlareMode
 }
 
 /**
@@ -61,6 +74,7 @@ export const DEFAULT_GLOBAL_SETTINGS: GlobalSettings = {
   animations: 'default',
   smoothScroll: false,
   dimImages: true, // antireflective: images are the biggest glare source
+  glare: 'auto', // adapt text to the light around the screen
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -71,6 +85,7 @@ export const DEFAULT_SETTINGS: Settings = {
 
 const THEME_MODES: ThemeMode[] = ['auto', 'amoled']
 const ANIMATION_MODES: AnimationMode[] = ['default', 'off']
+const GLARE_MODES: GlareMode[] = ['auto', 'night', 'indoor', 'sunlight']
 
 const clamp = (n: number, min: number, max: number): number => Math.min(max, Math.max(min, n))
 
@@ -121,6 +136,7 @@ export function normalizeSettings(input: unknown): Settings {
         profile.animations = oneOf(p.animations, ANIMATION_MODES, 'default')
       if (typeof p.smoothScroll === 'boolean') profile.smoothScroll = p.smoothScroll
       if (typeof p.dimImages === 'boolean') profile.dimImages = p.dimImages
+      if (typeof p.glare === 'string') profile.glare = oneOf(p.glare, GLARE_MODES, 'auto')
       sites[host] = profile
     }
   }
@@ -141,6 +157,10 @@ export function normalizeSettings(input: unknown): Settings {
           : 'default',
       smoothScroll: global.smoothScroll === true,
       dimImages: global.dimImages !== false, // default ON; only explicit false turns it off
+      glare:
+        typeof global.glare === 'string'
+          ? oneOf(global.glare, GLARE_MODES, DEFAULT_GLOBAL_SETTINGS.glare)
+          : DEFAULT_GLOBAL_SETTINGS.glare,
     },
     sites,
   }

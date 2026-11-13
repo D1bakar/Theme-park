@@ -33,7 +33,7 @@ Works on Chrome and Brave (any Chromium browser, MV3). Not on Firefox or Safari.
 | M0 — infra | repo, CI, releases, website, governance | ✅ done |
 | M1 — core | schema → storage → theme engine → popup | ✅ done |
 | Product pivot | single theme: AMOLED antireflective (glass gallery retired) | ✅ done |
-| Antireflective | true black, image dimming, anti-flash load | ✅ done |
+| Antireflective | true black, glare-aware text, image dimming, anti-flash load | ✅ done |
 | Browser theme pack | dark chrome theme (Liquid Glass assets, optional add-on) | ✅ shipped |
 | M2 — per-site profiles | hostname overrides, options page | planned |
 | M3 — readability polish | font/width engine refinements | planned |

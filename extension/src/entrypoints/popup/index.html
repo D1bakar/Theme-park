@@ -16,11 +16,22 @@
     </p>
 
     <main>
-      <section aria-label="Theme">
+      <section aria-label="Theme and glare">
         <div class="row">
           <span class="row-label" id="pw-label">AMOLED antireflective</span>
           <span class="value" id="pw-value" aria-hidden="true"></span>
           <button type="button" id="pw-toggle" class="switch" role="switch" aria-labelledby="pw-label" aria-checked="false"></button>
+        </div>
+
+        <div class="row row-stack">
+          <span class="row-label" id="gl-label">Glare</span>
+          <span class="segments segments-4" role="radiogroup" aria-labelledby="gl-label">
+            <button type="button" role="radio" aria-checked="true" data-glare="auto">Auto</button>
+            <button type="button" role="radio" aria-checked="false" data-glare="night">Night</button>
+            <button type="button" role="radio" aria-checked="false" data-glare="indoor">Indoor</button>
+            <button type="button" role="radio" aria-checked="false" data-glare="sunlight">Sun</button>
+          </span>
+          <p class="hint">Auto follows the light around your screen.</p>
         </div>
       </section>
 
