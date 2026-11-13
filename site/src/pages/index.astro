@@ -1,116 +1,127 @@
 ---
 import Base from '../layouts/Base.astro';
-
-// Stable-download contract: the release workflow publishes EVERY version with
-// the asset name `ThemePark-chrome.zip`, so this URL never goes stale.
-// (If the asset is missing — e.g. before the first release — GitHub 404s;
-//  the release workflow in .github/workflows/release.yml is the guarantee.)
-const INSTALL_URL =
-  'https://github.com/D1bakar/Theme-park/releases/latest/download/ThemePark-chrome.zip';
-const RELEASES_URL = 'https://github.com/D1bakar/Theme-park/releases';
-const THEME_URL =
-  'https://github.com/D1bakar/Theme-park/releases/latest/download/ThemePark-liquid-glass-theme.zip';
-
-const controls = [
-  {
-    title: 'True black',
-    body: 'AMOLED antireflective — #000000 on the page and its panels, so OLED pixels emit nothing. Not dark gray: black.',
-  },
-  {
-    title: 'Anti-glare',
-    body: 'Text adapts to the light around you — dim at night, brighter in daylight. Images dim to match, and no page ever flashes white on load.',
-  },
-  {
-    title: 'Comfort',
-    body: 'Text size, line height and reading width steppers. One switch to calm every animation on the web.',
-  },
-];
-
-const steps = [
-  'Download the zip with the button above.',
-  'Unzip it anywhere you like — it is a plain folder.',
-  'Open <code>chrome://extensions</code>, enable <strong>Developer mode</strong>, then click <strong>Load unpacked</strong> and pick the folder.',
-];
-
-const browserThemeSteps = [
-  'Open <code>chrome://extensions</code> with Developer mode on.',
-  'Click <strong>Load unpacked</strong> and pick the unzipped theme folder.',
-  'Your tabs, toolbar and new-tab page go dark to match. Pages are handled by the extension itself.',
-];
 ---
 
-<Base
-  title="ThemePark — AMOLED antireflective dark for Chrome & Brave"
-  description="One extension, one theme: AMOLED antireflective dark. True black, glare-aware text, dimmed images, no white flash. Typography and animation controls included. All settings local — nothing leaves your device."
->
-  <section class="hero">
-    <p class="eyebrow">Chrome · Brave · Manifest V3</p>
-    <h1>One theme. AMOLED antireflective.</h1>
+<Base title="ThemePark — AMOLED antireflective theme" description="One extension, one theme, total browsing antireflection.">
+  <div class="hero">
+    <div class="eyebrow">AMOLED antireflective theme</div>
+    <h1>True black. True contrast. True matte.</h1>
     <p class="hero-tagline">
-      A matte screen for your eyes: true black everywhere, text that adapts to the
-      light around you, images dimmed, no white flash on load. Load it once — every
-      site you visit goes dark. Every setting stays on your device.
+      ThemePark gives you one AMOLED antireflective theme that adapts to the light around you — dim in a dark room, bright in daylight, and pure white in sunlight for maximum contrast through the reflective veil.
     </p>
     <div class="cta-row">
-      <a class="btn btn-primary" href={INSTALL_URL} download>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"></path>
+      <a href="https://github.com/D1bakar/Theme-park/releases/latest/download/ThemePark-chrome.zip" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
         </svg>
         Install ThemePark
       </a>
-      <a class="btn btn-ghost" href="https://github.com/D1bakar/Theme-park" rel="noopener">View source</a>
+      <a href="https://github.com/D1bakar/Theme-park" class="btn btn-ghost">
+        View on GitHub
+      </a>
     </div>
-    <p class="cta-note">Free, open source. No account, no tracking, no data collection. <a href={RELEASES_URL} rel="noopener">All releases →</a></p>
-  </section>
-
-  <p class="section-label">What it does</p>
-  <div class="grid-3">
-    {controls.map((c) => (
-      <article class="card">
-        <h3>{c.title}</h3>
-        <p>{c.body}</p>
-      </article>
-    ))}
-  </div>
-
-  <p class="section-label" id="install">Install in three steps</p>
-  <div class="card">
-    <ol class="steps">
-      {steps.map((s) => <li set:html={s} />)}
-    </ol>
-    <p style="margin: 14px 0 0; font-size: 13px;">
-      Works on Chrome and Brave (and most Chromium browsers). Not on Firefox or Safari yet.
+    <p class="cta-note">
+      Open source. No analytics. No accounts. All settings stay on your device.
     </p>
   </div>
 
-  <p class="section-label" id="themes">Optional: the browser chrome, too</p>
+  <div class="section-label">How it works</div>
   <div class="grid-2">
-    <article class="card">
-      <div class="swatch">
-        <div class="swatch-dots" aria-hidden="true">
-          <span style="background: #000000;" />
-          <span style="background: #0a0a0a;" />
-          <span style="background: #d4d4d4;" />
-        </div>
-        <div style="min-width:0;">
-          <h3 style="margin-bottom: 2px;">Browser theme pack</h3>
-          <p style="font-size: 13.5px;">Tabs, toolbar and new-tab page go dark to match the extension. Static by design — browser UI can't be scripted.</p>
-        </div>
-      </div>
-      <a class="btn btn-ghost" style="margin-top: 12px; font-size: 13px; padding: 7px 14px;" href={THEME_URL} download>
-        Download theme pack
-      </a>
-    </article>
-    <article class="card">
-      <h3>Why one theme?</h3>
-      <p>ThemePark used to be a theme gallery. We picked the one worth using and made it excellent: pure black, anti-glare, zero lag, zero weird behaviour. One switch, everything dark, everywhere.</p>
-    </article>
+    <div class="card">
+      <h3>AMOLED antireflective</h3>
+      <p>
+        True #000000 everywhere — buttons, cards, table cells, inline styles. No light surfaces survive.
+      </p>
+    </div>
+    <div class="card">
+      <h3>Adaptive glare</h3>
+      <p>
+        Text luminance follows the light around you — dim at night, neutral indoors, bright in sunlight.
+      </p>
+    </div>
+    <div class="card">
+      <h3>Per-site profiles</h3>
+      <p>
+        Fine-grained control over font size, line height, reading width, and animations — globally or per site.
+      </p>
+    </div>
+    <div class="card">
+      <h3>Privacy-first</h3>
+      <p>
+        Zero network requests. No analytics. No accounts. All settings live in your browser.
+      </p>
+    </div>
   </div>
 
-  <p class="section-label">How to apply the browser theme (optional)</p>
+  <div id="glare" class="section-label">Glare levels</div>
+  <div class="grid-3">
+    <div class="glare-card">
+      <svg class="glare-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+      <h3>Night</h3>
+      <p>
+        Dim text to avoid OLED halation in a dark room. Images dimmed hardest.
+      </p>
+    </div>
+    <div class="glare-card">
+      <svg class="glare-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"></circle>
+        <path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"></path>
+      </svg>
+      <h3>Indoor</h3>
+      <p>
+        Neutral tuning for ordinary indoor lighting. The default setting.
+      </p>
+    </div>
+    <div class="glare-card">
+      <svg class="glare-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"></circle>
+        <path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"></path>
+        <path d="M12 17.5L12 23M8.5 12L3 12M15.5 12L21 12"></path>
+      </svg>
+      <h3>Sunlight</h3>
+      <p>
+        Pure white text for maximum contrast through the reflective veil. Links and hairlines brighten.
+      </p>
+    </div>
+  </div>
+
+  <div id="install" class="section-label">Install</div>
   <div class="card">
     <ol class="steps">
-      {browserThemeSteps.map((s) => <li set:html={s} />)}
+      <li>
+        <strong>Download the extension:</strong> <a href="https://github.com/D1bakar/Theme-park/releases/latest/download/ThemePark-chrome.zip">ThemePark-chrome.zip</a>
+      </li>
+      <li>
+        <strong>Unzip the file</strong> to a folder on your computer.
+      </li>
+      <li>
+        <strong>Load it in Chrome or Brave:</strong> go to <code>chrome://extensions</code> or <code>brave://extensions</code>, enable "Developer mode", and click "Load unpacked".
+      </li>
     </ol>
+  </div>
+
+  <div class="section-label">Known limits</div>
+  <div class="card">
+    <p>
+      ThemePark is software-only: it maximizes legibility through external-light reflections, but it cannot remove physical reflections or apply a matte coating. Known limitations:
+    </p>
+    <ul style="color: var(--text-secondary); font-size: 14px; margin-left: 20px; margin-bottom: 0;">
+      <li style="margin-bottom: 8px;">
+        <strong>Photos via background-image</strong> — CSS has no selector for "element that has one", so photos painted this way stay full-bright. Gradient-only backgrounds are neutralised.
+      </li>
+      <li style="margin-bottom: 8px;">
+        <strong>Closed shadow DOM</strong> — styles inside shadow trees are not reachable.
+      </li>
+      <li style="margin-bottom: 8px;">
+        <strong>Video and canvas</strong> — these are rendered by the page, not by CSS.
+      </li>
+      <li style="margin-bottom: 8px;">
+        <strong>Chrome:// pages, PDF viewer, and other restricted pages</strong> — these are out of scope for this extension.
+      </li>
+    </ul>
   </div>
 </Base>

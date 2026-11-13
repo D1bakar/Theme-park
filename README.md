@@ -1,73 +1,70 @@
 # ThemePark
 
-**Total browsing customization for Chrome & Brave — one extension.**
+**AMOLED antireflective theme — one extension, one theme, total browsing antireflection.**
 
-ThemePark gives you fine-grained control over how the web looks, feels and reads:
-site appearance (dark / light / AMOLED themes with your own accents), smoothness
-(animation control that honors reduced motion), and readability (font, size,
-line-height, reading width) — globally or per site, with presets, per-site
-profiles and keyboard shortcuts. Everything runs locally.
+ThemePark gives you a single AMOLED antireflective theme that maximizes legibility through external-light reflections:
 
-> **Privacy:** no analytics, no accounts, no network requests. All settings live
-> in your browser. See the [privacy page](https://themepark-site-jet.vercel.app/privacy/)
-> — and since the code is public, verify it yourself.
+- **True #000000 everywhere** — buttons, cards, table cells, inline styles, scrollbars. No light surfaces survive.
+- **Adaptive glare** — text luminance follows the light around you (night → indoor → sunlight) so content is legible in any condition.
+- **Per-site profiles** — fine-grained control over font size, line height, reading width, and animations — globally or per site.
+- **Privacy-first** — zero network requests. No analytics. No accounts. All settings live in your browser.
+
+> **Privacy:** no analytics, no accounts, no network requests. See the [privacy page](https://themepark-site-jet.vercel.app/privacy/) — and since the code is public, verify it yourself.
 
 [![CI](https://github.com/D1bakar/Theme-park/actions/workflows/ci.yml/badge.svg)](https://github.com/D1bakar/Theme-park/actions/workflows/ci.yml)
 
 ## Install
 
-**From the website (easiest):** [themepark-site-jet.vercel.app](https://themepark-site-jet.vercel.app)
-→ click **Install ThemePark** → unzip → load unpacked (3 steps on the page).
+**From the website (easiest):** [themepark-site-jet.vercel.app](https://themepark-site-jet.vercel.app) → click **Install ThemePark** → unzip → load unpacked (3 steps on the page).
 
-**Direct:** [latest release zip](https://github.com/D1bakar/Theme-park/releases/latest/download/ThemePark-chrome.zip)
-→ unzip → `chrome://extensions` → Developer mode → **Load unpacked** → pick the folder.
+**Direct:** [latest release zip](https://github.com/D1bakar/Theme-park/releases/latest/download/ThemePark-chrome.zip).
 
-**Chrome Web Store:** planned — the store build is the same zip, review pending.
+## How it works
 
-Works on Chrome and Brave (any Chromium browser, MV3). Not on Firefox or Safari.
+### AMOLED antireflective
 
-## Status
+True #000000 EVERYWHERE — a blanket background-color takeover kills every light surface (buttons, cards, table cells, inline styles) — not just known panels. This is the software answer to a reflective veil: the OLED panel emits nothing, so external reflections are the only source of glare.
 
-| Milestone | Scope | State |
-|---|---|---|
-| M0 — infra | repo, CI, releases, website, governance | ✅ done |
-| M1 — core | schema → storage → theme engine → popup | ✅ done |
-| Product pivot | single theme: AMOLED antireflective (glass gallery retired) | ✅ done |
-| Antireflective | true black, glare-aware text, image dimming, anti-flash load | ✅ done |
-| Browser theme pack | dark chrome theme (Liquid Glass assets, optional add-on) | ✅ shipped |
-| M2 — per-site profiles | hostname overrides, options page | planned |
-| M3 — readability polish | font/width engine refinements | planned |
-| M4 — presets + shortcuts | named presets, `commands` API | planned |
-| M5 — store | Web Store listing and submission | planned |
+### Adaptive glare
 
-## Repository layout
+Text luminance moves with the light around you:
 
-```
-extension/   MV3 extension (WXT + TypeScript) — the product
-site/        Astro website — install hub, themes, privacy
-themes/      Companion browser-chrome theme packs (manifest-only)
-docs/        Architecture decisions (ADRs) and engineering docs
-```
+- **Night:** dim text to avoid OLED halation in a dark room. Images dimmed hardest.
+- **Indoor:** neutral tuning for ordinary indoor lighting. The default setting.
+- **Sunlight:** pure white text for maximum contrast through the reflective veil. Links and hairlines brighten.
 
-## Development
+AmbientLightSensor reads the light around your screen (when available), and local time is the fallback. Hysteresis and a three-sample debounce prevent clouds and passing shadows from flickering the page.
 
-```bash
-pnpm install          # once, at the repo root (workspace: extension, site, themes/*)
-pnpm ext:dev          # extension dev mode (loads into your browser with HMR)
-pnpm ext:build        # production build → extension/build/chrome-mv3
-pnpm site:dev         # website dev server
-pnpm lint             # biome check (format + lint, whole monorepo)
-pnpm --filter extension test   # unit tests (vitest)
-```
+### Per-site profiles
 
-Requires Node ≥ 22.12 and pnpm ≥ 12.
+Fine-grained control over:
 
-## Contributing
+- Font size, line height, reading width (comfort controls)
+- Animation smoothness (smooth scroll, reduced motion)
+- Per-site profiles (save presets for different sites)
 
-See [AGENTS.md](AGENTS.md) — the engineering contract: conventional commits,
-trunk-based with PR-gated `main`, least-privilege permissions, zero network
-calls, accessibility is not optional. CI enforces it.
+### Privacy-first
+
+ThemePark has no servers, no analytics, no accounts, and makes no network requests. Everything it does — themes, fonts, animation settings, per-site profiles — is computed and stored locally in your browser using Chrome's storage APIs.
+
+The extension reads the pages you visit only to apply the visual settings you chose (colors, fonts, motion). It never sends page content, URLs, or usage data anywhere.
+
+## Known limits
+
+ThemePark is software-only: it maximizes legibility through external-light reflections, but it cannot remove physical reflections or apply a matte coating. Known limitations:
+
+- **Photos via background-image** — CSS has no selector for "element that has one", so photos painted this way stay full-bright. Gradient-only backgrounds are neutralised.
+- **Closed shadow DOM** — styles inside shadow trees are not reachable.
+- **Video and canvas** — these are rendered by the page, not by CSS.
+- **Chrome:// pages, PDF viewer, and other restricted pages** — these are out of scope for this extension.
 
 ## License
 
-[MIT](LICENSE)
+MIT
+
+## Links
+
+- [Website](https://themepark-site-jet.vercel.app)
+- [GitHub](https://github.com/D1bakar/Theme-park)
+- [Privacy Policy](https://themepark-site-jet.vercel.app/privacy)
+- [Release Downloads](https://github.com/D1bakar/Theme-park/releases)
