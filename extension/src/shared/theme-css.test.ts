@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import type { GlobalSettings } from './schema'
-import { buildAmoledCss, buildThemeCss, PANEL_CONTAINERS } from './theme-css'
+import { buildAmoledCss, buildThemeCss } from './theme-css'
 
 const base: GlobalSettings = {
   theme: 'auto', // power switch off — inject nothing
@@ -13,37 +13,46 @@ const base: GlobalSettings = {
   dimImages: true,
 }
 
-describe('buildAmoledCss — the one theme (antireflective)', () => {
+describe('buildAmoledCss — the one theme (total antireflection)', () => {
   const css = buildAmoledCss()
 
-  it('true #000000 on root and bounded panels — no gray glow', () => {
-    expect(css).toContain('--tp-bg:#000000')
-    expect(css).toContain('background-color:#000000!important')
-    expect(css).toContain('body>#root')
-    expect(css).toContain('body>#__next>div')
+  it('BLANKET takeover: every surface goes #000 — no shiny elements survive', () => {
+    // The whole-screen antireflection contract: blanket background-color,
+    // pseudo-elements included. Explicit light backgrounds (buttons, cards,
+    // inline styles) cannot survive this.
+    expect(css).toContain(
+      '*,*::before,*::after{background-color:#000000!important;color:#d4d4d4!important;border-color:#1f1f1f!important;box-shadow:none!important;text-shadow:none!important}',
+    )
+    expect(css).toContain('html,body{background-color:#000000!important')
   })
 
-  it('text luminance tuned to cut halation — not pure white', () => {
+  it('uniform anti-halation text — every glyph at ~83%, never pure white', () => {
     expect(css).toContain('--tp-fg:#d4d4d4')
     expect(css).not.toContain('#f0f0f0')
+    expect(css).not.toMatch(/color:#f{3,}/)
   })
 
-  it('dimmed link tone and tuned selection color', () => {
+  it('glow sources removed: box-shadow and text-shadow blanketed away', () => {
+    expect(css).toContain('box-shadow:none!important')
+    expect(css).toContain('text-shadow:none!important')
+  })
+
+  it('links keep one dim accent; caret visible; selection tuned', () => {
     expect(css).toContain('a{color:#86a8ff!important}')
+    expect(css).toContain('input,textarea{caret-color:#d4d4d4!important}')
     expect(css).toContain('::selection{background:#1a3a6a')
   })
 
-  it('solid colors only — no blur, no blanket selectors (no weird behaviour)', () => {
+  it('never uses backdrop-filter — the blanket ban is filters, not colors', () => {
     expect(css).not.toContain('backdrop-filter')
-    expect(css).not.toMatch(/\*[,{}]/)
   })
 
   it('declares dark color-scheme for form controls and scrollbars', () => {
     expect(css).toContain('color-scheme:dark')
   })
 
-  it('stays tiny — solid-color sheet must remain under 1KB', () => {
-    expect(new TextEncoder().encode(css).length).toBeLessThan(1024)
+  it('stays small — the whole blackout sheet must remain under ~1.5KB', () => {
+    expect(new TextEncoder().encode(css).length).toBeLessThan(1536)
   })
 })
 
@@ -77,8 +86,18 @@ describe('buildThemeCss — single-theme contract', () => {
     const css = buildThemeCss({ ...base, theme: 'amoled', dimImages: true }) ?? ''
     expect(css).not.toContain('backdrop-filter')
     expect(css).not.toContain('border-radius')
-    // The panel rule is exactly one property.
-    expect(css).toContain(`${PANEL_CONTAINERS}{background-color:#000000!important}`)
+  })
+
+  it('svg artwork dims with images when dim images is on', () => {
+    const css = buildThemeCss({ ...base, theme: 'amoled' }) ?? ''
+    expect(css).toContain('img{filter:brightness(.82)!important}')
+    expect(css).toContain('svg{opacity:.82!important}')
+  })
+
+  it('svg dim removed together with the img dim when off', () => {
+    const css = buildThemeCss({ ...base, theme: 'amoled', dimImages: false }) ?? ''
+    expect(css).not.toContain('filter:')
+    expect(css).not.toContain('svg{')
   })
 })
 

@@ -15,35 +15,37 @@ import type { GlobalSettings, ThemeMode } from './schema'
 const clamp = (n: number, min: number, max: number): number => Math.min(max, Math.max(min, n))
 
 /**
- * Bounded panel set: body's direct children, landmarks, and known framework
- * app roots (plus one level inside — React/Next/Vue/Gatsby bury the visible
- * container there). Solid-color rules on this set are cheap; the set is
- * bounded so pages never melt (perf budget, AGENTS.md).
- */
-export const PANEL_CONTAINERS =
-  'body>div,body>main,body>header,body>footer,body>nav,body>section,body>article,body>aside,' +
-  'body>#root,body>#app,body>#__next,body>#___gatsby,' +
-  'body>#root>div,body>#app>div,body>#__next>div,body>#___gatsby>div'
-
-/**
- * AMOLED anti-reflective dark — the one theme.
+ * AMOLED anti-reflective dark — the one theme. TOTAL antireflection:
+ * the whole screen goes matte, not just some surfaces.
  *
  * Anti-reflective = every glare source removed, like a matte screen:
- * - True #000000 on the root AND the bounded panel set (OLED pixels fully
- *   off; gray panels are the classic AMOLED-mode failure).
- * - Text luminance ~83% (#d4d4d4): pure white on black blooms and reads as
- *   glare on OLED — the standard anti-halation tuning.
- * - Dimmed link tone; tuned selection color.
+ * - True #000000 EVERYWHERE: a blanket background-color takeover kills every
+ *   light surface (buttons, cards, table cells, inline styles) — not just
+ *   known panels. Blanket *plain-color* rules are compositor-cheap; the
+ *   perf ban (AGENTS.md) is on blanket backdrop-filter, still enforced.
+ * - Uniform #d4d4d4 text: every glyph at ~83% luminance — no white text
+ *   blooms on OLED anywhere.
+ * - Glow removal: box-shadow and text-shadow blanketed away; hairlines
+ *   forced dark instead of light.
+ * - Images (and svg artwork) pulled down to 82% when dimImages is on.
  *
- * Solid colors only: no backdrop-filter, no blanket `*` selectors.
+ * Known boundary (honest): a photo painted via `background-image` cannot be
+ * selectively dimmed — CSS has no selector for "element that has one".
+ * img/video-adjacent content dims; CSS-background photos stay full-bright.
+ *
+ * Solid colors only: no backdrop-filter, no JS color rewriting, no loops.
  */
 export function buildAmoledCss(): string {
   return [
     ':root{--tp-bg:#000000;--tp-fg:#d4d4d4}',
-    'html,body{background-color:var(--tp-bg)!important;color:var(--tp-fg)!important}',
+    'html,body{background-color:#000000!important;color:#d4d4d4!important}',
     'html{color-scheme:dark}',
-    `${PANEL_CONTAINERS}{background-color:#000000!important}`,
+    // The blanket takeover — every surface, pseudo-element included.
+    '*,*::before,*::after{background-color:#000000!important;color:#d4d4d4!important;border-color:#1f1f1f!important;box-shadow:none!important;text-shadow:none!important}',
+    // Links keep one accent (specificity beats the blanket `*` naturally).
     'a{color:#86a8ff!important}',
+    // Inputs' caret stays visible on black.
+    'input,textarea{caret-color:#d4d4d4!important}',
     '::selection{background:#1a3a6a!important;color:#e8e8e8}',
   ].join('')
 }
@@ -63,6 +65,8 @@ export function buildThemeCss(g: GlobalSettings): string | null {
       // glare source on OLED in the dark. Images only — filters on video
       // cost composite layers for little gain (perf budget).
       rules.push('img{filter:brightness(.82)!important}')
+      // White-filled SVG artwork (icons, logos) glares the same way.
+      rules.push('svg{opacity:.82!important}')
     }
   }
 
