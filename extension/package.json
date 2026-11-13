@@ -1,7 +1,7 @@
 {
   "name": "extension",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.5.0",
   "type": "module",
   "description": "ThemePark extension — themes, smoothness and readability control for the web (Chrome/Brave MV3).",
   "scripts": {
