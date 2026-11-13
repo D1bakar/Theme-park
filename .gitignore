@@ -27,3 +27,5 @@ extension/build/
 .eslintcache
 coverage/
 Cached Theme.pak
+.vercel
+.env*
