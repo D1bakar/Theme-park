@@ -95,6 +95,24 @@ describe('buildAmoledCss — adaptive glare levels', () => {
     expect(sunlight).toContain('#f5f5f5')
     expect(sunlight).not.toContain('#b4b4b8')
   })
+
+  it('autofill glare is forced black, with level-toned text and caret', () => {
+    const css = buildAmoledCss('indoor')
+    expect(css).toContain(
+      'input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus{',
+    )
+    expect(css).toContain('box-shadow:0 0 0 1000px #000000 inset!important')
+    expect(css).toContain('-webkit-text-fill-color:#d4d4d4!important')
+    expect(buildAmoledCss('sunlight')).toContain('-webkit-text-fill-color:#f5f5f5!important')
+    expect(buildAmoledCss('night')).toContain('-webkit-text-fill-color:#b4b4b8!important')
+  })
+
+  it('native file-picker button goes black too', () => {
+    const css = buildAmoledCss('indoor')
+    expect(css).toContain(
+      'input::file-selector-button{background-color:#000000!important;color:#d4d4d4!important;border-color:#1f1f1f!important}',
+    )
+  })
 })
 
 describe('buildThemeCss — single-theme contract', () => {
