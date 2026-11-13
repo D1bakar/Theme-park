@@ -10,31 +10,15 @@ const { title, description } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#f3f1eb" />
+    <meta name="theme-color" content="#000000" />
     <link rel="preload" href="/fonts/instrument-serif-400-italic.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin />
-    <script is:inline>
-      // Theme is applied before first paint (no flash). Saved choice wins;
-      // default is warm paper. Toggle cycles light → dark → glass.
-      (() => {
-        const VALID = ['light', 'dark', 'glass'];
-        const META = { light: '#f3f1eb', dark: '#000000', glass: '#090b10' };
-        try {
-          const saved = localStorage.getItem('tp-theme');
-          const theme = VALID.includes(saved) ? saved : 'light';
-          document.documentElement.dataset.theme = theme;
-          document.querySelector('meta[name="theme-color"]')?.setAttribute('content', META[theme]);
-        } catch {
-          /* storage unavailable — keep default */
-        }
-      })();
-    </script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -43,14 +27,10 @@ const { title, description } = Astro.props;
       <a class="header-logo" href="/">ThemePark</a>
       <nav class="header-links" aria-label="Site">
         <a href="/#install">Install</a>
-        <a href="/#themes">Themes</a>
+        <a href="/#features">Features</a>
+        <a href="/#glare">Glare levels</a>
         <a href="/privacy/">Privacy</a>
-        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch theme">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="5"></circle>
-            <path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"></path>
-          </svg>
-        </button>
+        <a href="https://github.com/D1bakar/Theme-park" rel="noopener">GitHub</a>
       </nav>
     </header>
 
@@ -62,44 +42,13 @@ const { title, description } = Astro.props;
       <div class="dock">
         <nav class="dock-links" aria-label="Footer">
           <a href="/#install">Install</a>
-          <a href="/#themes">Themes</a>
+          <a href="/#features">Features</a>
+          <a href="/#glare">Glare levels</a>
           <a href="/privacy/">Privacy</a>
           <a href="https://github.com/D1bakar/Theme-park" rel="noopener">GitHub</a>
         </nav>
         <p class="dock-credit">made by <a href="https://hello-d1bakar.vercel.app/" rel="noopener">D1bakar</a></p>
       </div>
     </footer>
-
-    <script is:inline>
-      // Delegated handler survives markup; cycles light → dark → glass.
-      (() => {
-        const ORDER = ['light', 'dark', 'glass'];
-        const META = { light: '#f3f1eb', dark: '#000000', glass: '#090b10' };
-        const root = () => document.documentElement;
-        const current = () => {
-          const t = root().dataset.theme;
-          return ORDER.includes(t) ? t : 'light';
-        };
-        const sync = () => {
-          document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
-            btn.setAttribute(
-              'aria-label',
-              `Theme: ${current()}. Switch to ${ORDER[(ORDER.indexOf(current()) + 1) % ORDER.length]}`,
-            );
-          });
-        };
-        document.addEventListener('click', (e) => {
-          if (!e.target?.closest?.('[data-theme-toggle]')) return;
-          const next = ORDER[(ORDER.indexOf(current()) + 1) % ORDER.length];
-          root().dataset.theme = next;
-          try {
-            localStorage.setItem('tp-theme', next);
-          } catch {}
-          document.querySelector('meta[name="theme-color"]')?.setAttribute('content', META[next]);
-          sync();
-        });
-        sync();
-      })();
-    </script>
   </body>
 </html>
