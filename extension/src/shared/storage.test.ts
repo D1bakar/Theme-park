@@ -33,6 +33,7 @@ const sample: Settings = {
     animations: 'default',
     smoothScroll: false,
     dimImages: true,
+    glare: 'auto',
   },
   sites: { 'example.com': { enabled: true, theme: 'auto' } },
 }

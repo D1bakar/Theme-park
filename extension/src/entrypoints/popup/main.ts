@@ -7,7 +7,7 @@
  * switch + comfort controls. Nothing else.
  */
 
-import type { Settings } from '@/shared/schema'
+import type { GlareMode, Settings } from '@/shared/schema'
 import { getSettingsStore } from '@/shared/storage'
 
 const FS_STEP = 5
@@ -41,6 +41,8 @@ const dmToggle = $('dm-toggle')
 const dmValue = $<HTMLElement>('dm-value')
 const anToggle = $('an-toggle')
 const anValue = $<HTMLElement>('an-value')
+const glareButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-glare]'))
+const glareGroup = document.querySelector<HTMLElement>('[role="radiogroup"]')
 const warning = $('warning')
 const restrictedNotice = $('restricted-notice')
 
@@ -50,6 +52,15 @@ function renderPower(g: Settings['global']) {
   const on = g.theme === 'amoled'
   pwToggle.setAttribute('aria-checked', String(on))
   pwValue.textContent = on ? 'On' : 'Off'
+}
+
+function renderGlareMode(g: Settings['global']) {
+  for (const button of glareButtons) {
+    const selected = button.dataset.glare === g.glare
+    button.setAttribute('aria-checked', String(selected))
+    // Roving tabindex: one stop for the whole radiogroup (a11y).
+    button.tabIndex = selected ? 0 : -1
+  }
 }
 
 function renderTypography(g: Settings['global']) {
@@ -74,6 +85,7 @@ function renderGlare(g: Settings['global']) {
 function render(s: Settings) {
   current = s
   renderPower(s.global)
+  renderGlareMode(s.global)
   renderTypography(s.global)
   renderGlare(s.global)
 }
@@ -98,6 +110,37 @@ pwToggle.addEventListener('click', () =>
     s.global.theme = s.global.theme === 'amoled' ? 'auto' : 'amoled'
   }),
 )
+
+// — glare compensation: auto / night / indoor / sunlight —
+for (const button of glareButtons) {
+  button.addEventListener('click', () => {
+    const mode = button.dataset.glare as GlareMode | undefined
+    if (mode === undefined) return
+    apply((s) => {
+      s.global.glare = mode
+    })
+  })
+}
+
+// Radio-group keyboard contract: arrows move + select, Home/End jump.
+glareGroup?.addEventListener('keydown', (event) => {
+  const keys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End']
+  if (!keys.includes(event.key)) return
+  const index = glareButtons.indexOf(document.activeElement as HTMLButtonElement)
+  if (index === -1) return
+  event.preventDefault()
+  let next = index
+  if (event.key === 'Home') next = 0
+  else if (event.key === 'End') next = glareButtons.length - 1
+  else {
+    const step = event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1 : -1
+    next = (index + step + glareButtons.length) % glareButtons.length
+  }
+  const target = glareButtons[next]
+  if (target === undefined) return
+  target.focus()
+  target.click() // selection follows focus, standard radio behavior
+})
 
 // — steppers —
 $('fs-dec').addEventListener('click', () =>

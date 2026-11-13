@@ -13,7 +13,7 @@ export default defineConfig({
     name: 'ThemePark',
     short_name: 'ThemePark',
     description:
-      'Fine-grained control of site appearance, smoothness and readability — themes, fonts, animations, per-site profiles. All local, no data leaves your device.',
+      'AMOLED antireflective dark for every site: true black, glare-aware text, dimmed images, no white flash. All local.',
     permissions: ['storage'],
     // Host permission justification (AGENTS.md requires written rationale):
     // the product applies user-chosen styling to pages the user visits, and

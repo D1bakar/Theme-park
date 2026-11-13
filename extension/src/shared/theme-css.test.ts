@@ -11,6 +11,7 @@ const base: GlobalSettings = {
   animations: 'default',
   smoothScroll: false,
   dimImages: true,
+  glare: 'auto',
 }
 
 describe('buildAmoledCss — the one theme (total antireflection)', () => {
@@ -56,6 +57,46 @@ describe('buildAmoledCss — the one theme (total antireflection)', () => {
   })
 })
 
+describe('buildAmoledCss — adaptive glare levels', () => {
+  it('night dims text for a dark room', () => {
+    const css = buildAmoledCss('night')
+    expect(css).toContain('--tp-fg:#b4b4b8')
+    expect(css).toContain('a{color:#8fa8dd!important}')
+    expect(css).toContain('border-color:#141414!important')
+  })
+
+  it('indoor is the neutral tuning', () => {
+    const css = buildAmoledCss('indoor')
+    expect(css).toContain('--tp-fg:#d4d4d4')
+    expect(css).toContain('a{color:#86a8ff!important}')
+    expect(css).toContain('border-color:#1f1f1f!important')
+  })
+
+  it('sunlight raises text and hairline luminance to punch through the veil', () => {
+    const css = buildAmoledCss('sunlight')
+    expect(css).toContain('--tp-fg:#f5f5f5')
+    expect(css).toContain('a{color:#a9c8ff!important}')
+    expect(css).toContain('border-color:#333333!important')
+  })
+
+  it('EVERY level keeps backgrounds true black — glare only moves content', () => {
+    for (const level of ['night', 'indoor', 'sunlight'] as const) {
+      const css = buildAmoledCss(level)
+      expect(css).toContain('background-color:#000000!important')
+      expect(css).not.toMatch(/background-color:(?!#000000)/)
+    }
+  })
+
+  it('sunlight is brighter than indoor, night is dimmer', () => {
+    const night = buildAmoledCss('night')
+    const sunlight = buildAmoledCss('sunlight')
+    expect(night).toContain('#b4b4b8')
+    expect(night).not.toContain('#f5f5f5')
+    expect(sunlight).toContain('#f5f5f5')
+    expect(sunlight).not.toContain('#b4b4b8')
+  })
+})
+
 describe('buildThemeCss — single-theme contract', () => {
   it('power off (auto) with untouched comfort controls → inject NOTHING', () => {
     expect(buildThemeCss(base)).toBeNull()
@@ -98,6 +139,43 @@ describe('buildThemeCss — single-theme contract', () => {
     const css = buildThemeCss({ ...base, theme: 'amoled', dimImages: false }) ?? ''
     expect(css).not.toContain('filter:')
     expect(css).not.toContain('svg{')
+  })
+})
+
+describe('buildThemeCss — glare wiring', () => {
+  it('manual glare setting compiles directly when no environment is supplied', () => {
+    const css = buildThemeCss({ ...base, theme: 'amoled', glare: 'night' }) ?? ''
+    expect(css).toContain('--tp-fg:#b4b4b8')
+    expect(css).toContain('background-color:#000000!important')
+  })
+
+  it('an explicit resolved level wins over the stored setting', () => {
+    const css = buildThemeCss({ ...base, theme: 'amoled', glare: 'night' }, 'sunlight') ?? ''
+    expect(css).toContain('--tp-fg:#f5f5f5')
+    expect(css).not.toContain('#b4b4b8')
+  })
+
+  it('auto without an environment falls back to the neutral indoor tuning', () => {
+    const css = buildThemeCss({ ...base, theme: 'amoled', glare: 'auto' }) ?? ''
+    expect(css).toContain('--tp-fg:#d4d4d4')
+  })
+
+  it('image and svg dimming follow the glare level', () => {
+    const night = buildThemeCss({ ...base, theme: 'amoled' }, 'night') ?? ''
+    const indoor = buildThemeCss({ ...base, theme: 'amoled' }, 'indoor') ?? ''
+    const sunlight = buildThemeCss({ ...base, theme: 'amoled' }, 'sunlight') ?? ''
+    expect(night).toContain('img{filter:brightness(.75)!important}')
+    expect(indoor).toContain('img{filter:brightness(.82)!important}')
+    expect(sunlight).toContain('img{filter:brightness(.9)!important}')
+    expect(night).toContain('svg{opacity:.75!important}')
+    expect(sunlight).toContain('svg{opacity:.9!important}')
+  })
+
+  it('glare never leaks into the background: black stays black at every level', () => {
+    for (const level of ['night', 'indoor', 'sunlight'] as const) {
+      const css = buildThemeCss({ ...base, theme: 'amoled' }, level) ?? ''
+      expect(css).toContain('background-color:#000000!important')
+    }
   })
 })
 

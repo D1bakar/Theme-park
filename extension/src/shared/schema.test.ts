@@ -22,6 +22,7 @@ describe('normalizeSettings', () => {
         animations: 'off',
         smoothScroll: true,
         dimImages: false,
+        glare: 'sunlight',
       },
       sites: {
         'example.com': { enabled: true, theme: 'auto', fontSize: 90 },
@@ -35,6 +36,7 @@ describe('normalizeSettings', () => {
     expect(out.global.animations).toBe('off')
     expect(out.global.smoothScroll).toBe(true)
     expect(out.global.dimImages).toBe(false)
+    expect(out.global.glare).toBe('sunlight')
     expect(out.sites['example.com']).toEqual({ enabled: true, theme: 'auto', fontSize: 90 })
   })
 
@@ -77,6 +79,22 @@ describe('normalizeSettings', () => {
     expect(normalizeSettings({}).global.dimImages).toBe(true)
     expect(normalizeSettings({ global: { dimImages: 'no' } }).global.dimImages).toBe(true)
     expect(normalizeSettings({ global: { dimImages: false } }).global.dimImages).toBe(false)
+  })
+
+  it('glare defaults to auto and accepts only the four valid modes', () => {
+    expect(normalizeSettings({}).global.glare).toBe('auto')
+    expect(normalizeSettings({ global: { glare: 'night' } }).global.glare).toBe('night')
+    expect(normalizeSettings({ global: { glare: 'sunlight' } }).global.glare).toBe('sunlight')
+    expect(normalizeSettings({ global: { glare: 'midnight' } }).global.glare).toBe('auto')
+    expect(normalizeSettings({ global: { glare: 7 } }).global.glare).toBe('auto')
+  })
+
+  it('site profiles can override glare independently', () => {
+    const out = normalizeSettings({
+      sites: { 'a.com': { enabled: true, glare: 'sunlight' }, 'b.com': { enabled: true } },
+    })
+    expect(out.sites['a.com']?.glare).toBe('sunlight')
+    expect(out.sites['b.com']?.glare).toBeUndefined()
   })
 
   it('unknown legacy fields are dropped silently (font was removed in the pivot)', () => {
