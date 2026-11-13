@@ -5,7 +5,9 @@ import {
   glareFromLux,
   LUX_NIGHT_MAX,
   LUX_SUNLIGHT_MIN,
+  nextGlare,
   resolveGlare,
+  settleGlare,
 } from './ambient'
 
 describe('glareFromLux — real ambient readings', () => {
@@ -79,5 +81,68 @@ describe('resolveGlare — setting + environment', () => {
   it('auto falls back to the clock when no sensor exists', () => {
     expect(resolveGlare('auto', null, 12)).toBe('sunlight')
     expect(resolveGlare('auto', null, 23)).toBe('night')
+  })
+})
+
+describe('nextGlare — hysteresis', () => {
+  it('does not leave night until the room is clearly brighter', () => {
+    expect(nextGlare('night', 40)).toBe('night')
+    expect(nextGlare('night', 69)).toBe('night')
+    expect(nextGlare('night', 70)).toBe('indoor')
+    expect(nextGlare('night', 500)).toBe('indoor')
+    expect(nextGlare('night', 1500)).toBe('sunlight')
+  })
+
+  it('does not leave sunlight until the light clearly drops', () => {
+    expect(nextGlare('sunlight', 5000)).toBe('sunlight')
+    expect(nextGlare('sunlight', 900)).toBe('sunlight')
+    expect(nextGlare('sunlight', 801)).toBe('sunlight')
+    expect(nextGlare('sunlight', 800)).toBe('indoor')
+    expect(nextGlare('sunlight', 40)).toBe('night')
+  })
+
+  it('indoor crosses the entry thresholds normally', () => {
+    expect(nextGlare('indoor', 49)).toBe('night')
+    expect(nextGlare('indoor', 50)).toBe('indoor')
+    expect(nextGlare('indoor', 999)).toBe('indoor')
+    expect(nextGlare('indoor', 1000)).toBe('sunlight')
+  })
+
+  it('garbage readings keep the current level', () => {
+    expect(nextGlare('sunlight', Number.NaN)).toBe('sunlight')
+    expect(nextGlare('night', -1)).toBe('night')
+  })
+})
+
+describe('settleGlare — debounce', () => {
+  const start = { level: 'indoor' as const, candidate: null, samples: 0 }
+
+  it('requires three consecutive readings before switching', () => {
+    let state = settleGlare(start, 'sunlight')
+    expect(state.level).toBe('indoor')
+    expect(state.samples).toBe(1)
+    state = settleGlare(state, 'sunlight')
+    expect(state.level).toBe('indoor')
+    expect(state.samples).toBe(2)
+    state = settleGlare(state, 'sunlight')
+    expect(state.level).toBe('sunlight')
+    expect(state.candidate).toBeNull()
+  })
+
+  it('a reading back at the current level kills the candidate', () => {
+    let state = settleGlare(start, 'sunlight')
+    state = settleGlare(state, 'sunlight')
+    state = settleGlare(state, 'indoor')
+    expect(state.level).toBe('indoor')
+    expect(state.candidate).toBeNull()
+    expect(state.samples).toBe(0)
+  })
+
+  it('a different candidate restarts the count', () => {
+    let state = settleGlare(start, 'sunlight')
+    state = settleGlare(state, 'night')
+    expect(state.level).toBe('indoor')
+    expect(state.candidate).toBe('night')
+    expect(state.samples).toBe(1)
   })
 })

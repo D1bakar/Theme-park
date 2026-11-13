@@ -72,11 +72,27 @@ describe('buildAmoledCss — adaptive glare levels', () => {
     expect(css).toContain('border-color:#1f1f1f!important')
   })
 
-  it('sunlight raises text and hairline luminance to punch through the veil', () => {
+  it('sunlight raises text to pure white and brightens the hairline', () => {
     const css = buildAmoledCss('sunlight')
-    expect(css).toContain('--tp-fg:#f5f5f5')
-    expect(css).toContain('a{color:#a9c8ff!important}')
-    expect(css).toContain('border-color:#333333!important')
+    expect(css).toContain('--tp-fg:#ffffff')
+    expect(css).toContain('a{color:#cfe0ff!important}')
+    expect(css).toContain('border-color:#3a3a3a!important')
+  })
+
+  it('removes html/body wallpapers — a page background photo is pure glare', () => {
+    const css = buildAmoledCss('indoor')
+    expect(css).toContain(
+      'html,body{background-color:#000000!important;background-image:none!important',
+    )
+  })
+
+  it('themes native scrollbars and form accents at every level', () => {
+    const css = buildAmoledCss('indoor')
+    expect(css).toContain('accent-color:#86a8ff')
+    expect(css).toContain('scrollbar-color:#1f1f1f #000000')
+    expect(css).toContain('::-webkit-scrollbar{')
+    expect(css).toContain('::-webkit-scrollbar-thumb{background:#1f1f1f!important')
+    expect(css).toContain('::-webkit-scrollbar-corner{background:#000000!important}')
   })
 
   it('EVERY level keeps backgrounds true black — glare only moves content', () => {
@@ -91,8 +107,8 @@ describe('buildAmoledCss — adaptive glare levels', () => {
     const night = buildAmoledCss('night')
     const sunlight = buildAmoledCss('sunlight')
     expect(night).toContain('#b4b4b8')
-    expect(night).not.toContain('#f5f5f5')
-    expect(sunlight).toContain('#f5f5f5')
+    expect(night).not.toContain('#ffffff')
+    expect(sunlight).toContain('#ffffff')
     expect(sunlight).not.toContain('#b4b4b8')
   })
 
@@ -103,7 +119,7 @@ describe('buildAmoledCss — adaptive glare levels', () => {
     )
     expect(css).toContain('box-shadow:0 0 0 1000px #000000 inset!important')
     expect(css).toContain('-webkit-text-fill-color:#d4d4d4!important')
-    expect(buildAmoledCss('sunlight')).toContain('-webkit-text-fill-color:#f5f5f5!important')
+    expect(buildAmoledCss('sunlight')).toContain('-webkit-text-fill-color:#ffffff!important')
     expect(buildAmoledCss('night')).toContain('-webkit-text-fill-color:#b4b4b8!important')
   })
 
@@ -169,7 +185,7 @@ describe('buildThemeCss — glare wiring', () => {
 
   it('an explicit resolved level wins over the stored setting', () => {
     const css = buildThemeCss({ ...base, theme: 'amoled', glare: 'night' }, 'sunlight') ?? ''
-    expect(css).toContain('--tp-fg:#f5f5f5')
+    expect(css).toContain('--tp-fg:#ffffff')
     expect(css).not.toContain('#b4b4b8')
   })
 

@@ -28,8 +28,9 @@ const cssNum = (n: number): string => String(n).replace(/^0\./, '.')
  *   the reflective veil; images dimmed least because emitted light is what
  *   makes them visible against daylight.
  *
- * All text tones stay below pure white: #f5f5f5 at the brightest, because
- * pure white on OLED blooms and reads as glare itself.
+ * Night and indoor tones stay below pure white: pure white on OLED blooms
+ * in a dark room and reads as glare itself. Sunlight is the exception —
+ * there the reflected veil is what hides content, so maximum luminance wins.
  */
 export interface GlareTone {
   /** Body text luminance. */
@@ -68,11 +69,11 @@ export const GLARE_TONES: Record<ResolvedGlare, GlareTone> = {
     svgOpacity: 0.82,
   },
   sunlight: {
-    fg: '#f5f5f5',
-    link: '#a9c8ff',
-    hairline: '#333333',
+    fg: '#ffffff',
+    link: '#cfe0ff',
+    hairline: '#3a3a3a',
     selectionBg: '#22477f',
-    selectionFg: '#f5f5f5',
+    selectionFg: '#ffffff',
     imageBrightness: 0.9,
     svgOpacity: 0.9,
   },
@@ -87,18 +88,24 @@ export const GLARE_TONES: Record<ResolvedGlare, GlareTone> = {
  *   light surface (buttons, cards, table cells, inline styles) — not just
  *   known panels. Blanket *plain-color* rules are compositor-cheap; the
  *   perf ban (AGENTS.md) is on blanket backdrop-filter, still enforced.
- * - Text at the glare level's luminance: dim in the dark, bright in
- *   daylight — the software answer to a reflective veil.
+ * - Page wallpapers removed: html/body background images are glare sources
+ *   with no content value behind the page.
+ * - Glare-aware content: text, links and hairlines move with the ambient
+ *   level; sunlight uses pure white because the reflective veil, not OLED
+ *   halation, is what limits legibility there.
  * - Glow removal: box-shadow and text-shadow blanketed away; hairlines
  *   forced dark instead of light.
  * - Native glare sources: Chrome's pale-blue autofill box is forced black
  *   with an inset shadow; file-picker buttons get the same tones.
+ * - Scrollbars and form accents follow the same level.
  * - Images (and svg artwork) pulled down to the level's brightness when
  *   dimImages is on.
  *
  * Known boundary (honest): a photo painted via `background-image` cannot be
  * selectively dimmed — CSS has no selector for "element that has one".
- * img/video-adjacent content dims; CSS-background photos stay full-bright.
+ * Gradient-only backgrounds are neutralised by the content script; mixes of
+ * photo and gradient are left alone. img/video-adjacent content dims;
+ * CSS-background photos stay full-bright.
  *
  * Solid colors only: no backdrop-filter, no JS color rewriting, no loops.
  */
@@ -106,10 +113,14 @@ export function buildAmoledCss(glare: ResolvedGlare = 'indoor'): string {
   const t = GLARE_TONES[glare]
   return [
     `:root{--tp-bg:#000000;--tp-fg:${t.fg}}`,
-    `html,body{background-color:#000000!important;color:${t.fg}!important}`,
-    'html{color-scheme:dark}',
+    `html,body{background-color:#000000!important;background-image:none!important;color:${t.fg}!important}`,
+    `html{color-scheme:dark;accent-color:${t.link};scrollbar-color:${t.hairline} #000000}`,
     // The blanket takeover — every surface, pseudo-element included.
     `*,*::before,*::after{background-color:#000000!important;color:${t.fg}!important;border-color:${t.hairline}!important;box-shadow:none!important;text-shadow:none!important}`,
+    // Scrollbars are pseudo-elements, so the blanket rule cannot reach them.
+    '::-webkit-scrollbar{width:12px;height:12px;background:#000000!important}',
+    `::-webkit-scrollbar-thumb{background:${t.hairline}!important;border:3px solid #000000}`,
+    '::-webkit-scrollbar-corner{background:#000000!important}',
     // Links keep one accent (specificity beats the blanket `*` naturally).
     `a{color:${t.link}!important}`,
     // Inputs' caret stays visible on black.
