@@ -26,15 +26,15 @@ function makeFakeAdapter() {
 const sample: Settings = {
   version: 1,
   global: {
-    theme: 'dark',
+    theme: 'amoled',
     fontSize: 120,
     lineHeight: 0,
     maxWidthCh: 0,
     animations: 'default',
     smoothScroll: false,
-    font: 'mac',
+    dimImages: true,
   },
-  sites: { 'example.com': { enabled: true, theme: 'light' } },
+  sites: { 'example.com': { enabled: true, theme: 'auto' } },
 }
 
 describe('createSettingsStore', () => {
