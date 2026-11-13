@@ -52,8 +52,16 @@ describe('normalizeSettings', () => {
     const out = normalizeSettings({
       global: { theme: 'neon-pink', animations: 'sometimes' },
     })
-    expect(out.global.theme).toBe('auto')
+    expect(out.global.theme).toBe('amoled') // flagship default, not adjacent mode
     expect(out.global.animations).toBe('default')
+  })
+
+  it('amoled is the default theme for fresh installs and garbage input', () => {
+    expect(normalizeSettings(null).global.theme).toBe('amoled')
+    expect(DEFAULT_SETTINGS.global.theme).toBe('amoled')
+    // Profiles fall back to the same default.
+    const profiled = normalizeSettings({ sites: { 'a.com': { enabled: true, theme: 'nope' } } })
+    expect(profiled.sites['a.com']?.theme).toBe('amoled')
   })
 
   it('font mode defaults to mac and coerces garbage to mac', () => {

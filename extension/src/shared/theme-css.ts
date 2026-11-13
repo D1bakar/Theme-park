@@ -19,10 +19,9 @@ interface Palette {
   scheme: 'dark' | 'light'
 }
 
-const PALETTES: Record<Exclude<ThemeMode, 'auto' | 'glass'>, Palette> = {
+const PALETTES: Record<Exclude<ThemeMode, 'auto' | 'glass' | 'amoled'>, Palette> = {
   light: { bg: '#ffffff', fg: '#1a1a1a', scheme: 'light' },
   dark: { bg: '#121212', fg: '#e8e8e8', scheme: 'dark' },
-  amoled: { bg: '#000000', fg: '#f0f0f0', scheme: 'dark' },
 }
 
 const clamp = (n: number, min: number, max: number): number => Math.min(max, Math.max(min, n))
@@ -70,6 +69,30 @@ export function buildGlassCss(): string {
   ].join('')
 }
 
+/**
+ * AMOLED anti-reflective dark — the flagship theme.
+ *
+ * Anti-reflective = every glow source removed:
+ * - True #000000 on the root AND on the bounded panel set (OLED pixels
+ *   fully off; panels staying gray is the classic AMOLED-mode failure).
+ * - Text luminance ~83% (#d4d4d4): pure white on pure black blooms and
+ *   reads as glare on OLED — the standard anti-halation tuning.
+ * - Dimmed link tone; tuned selection color.
+ *
+ * Solid colors only: no backdrop-filter, no blanket `*` selectors —
+ * cheap to composite, no weird behaviour (AGENTS.md).
+ */
+export function buildAmoledCss(): string {
+  return [
+    ':root{--tp-bg:#000000;--tp-fg:#d4d4d4}',
+    'html,body{background-color:var(--tp-bg)!important;color:var(--tp-fg)!important}',
+    'html{color-scheme:dark}',
+    `${GLASS_CONTAINERS}{background-color:#000000!important}`,
+    'a{color:#86a8ff!important}',
+    '::selection{background:#1a3a6a!important;color:#e8e8e8}',
+  ].join('')
+}
+
 /** Base64 data-URI font faces, imported by the content script (?inline). */
 export interface FontAssets {
   w400: string
@@ -113,6 +136,8 @@ export function buildThemeCss(g: GlobalSettings, fonts?: Partial<FontAssets>): s
 
   if (g.theme === 'glass') {
     rules.push(buildGlassCss())
+  } else if (g.theme === 'amoled') {
+    rules.push(buildAmoledCss())
   } else if (g.theme !== 'auto') {
     const p = PALETTES[g.theme]
     rules.push(`:root{--tp-bg:${p.bg};--tp-fg:${p.fg}}`)
