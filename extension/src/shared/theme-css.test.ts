@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { GlobalSettings } from './schema'
 import {
+  buildAmoledCss,
   buildFontCss,
   buildGlassCss,
   buildThemeCss,
@@ -74,6 +75,36 @@ describe('buildGlassCss — designed, not sprayed (v3)', () => {
 
   it('stays small — the whole glass sheet must remain under ~2KB', () => {
     expect(new TextEncoder().encode(css).length).toBeLessThan(2048)
+  })
+})
+
+describe('buildAmoledCss — anti-reflective dark (flagship)', () => {
+  const css = buildAmoledCss()
+
+  it('true #000000 on root and bounded panels — no gray glow', () => {
+    expect(css).toContain('--tp-bg:#000000')
+    expect(css).toContain('background-color:#000000!important')
+    expect(css).toContain('body>#root')
+    expect(css).toContain('body>#__next>div')
+  })
+
+  it('text luminance tuned to cut halation — not pure white', () => {
+    expect(css).toContain('--tp-fg:#d4d4d4')
+    expect(css).not.toContain('#f0f0f0')
+  })
+
+  it('dimmed link tone and tuned selection color', () => {
+    expect(css).toContain('a{color:#86a8ff!important}')
+    expect(css).toContain('::selection{background:#1a3a6a')
+  })
+
+  it('solid colors only — no blur, no blanket selectors (no weird behaviour)', () => {
+    expect(css).not.toContain('backdrop-filter')
+    expect(css).not.toMatch(/\*[,{}]/)
+  })
+
+  it('declares dark color-scheme for form controls and scrollbars', () => {
+    expect(css).toContain('color-scheme:dark')
   })
 })
 

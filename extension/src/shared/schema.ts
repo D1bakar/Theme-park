@@ -56,7 +56,7 @@ export interface Settings {
 }
 
 export const DEFAULT_GLOBAL_SETTINGS: GlobalSettings = {
-  theme: 'auto',
+  theme: 'amoled', // the one flagship theme — anti-reflective dark, out of the box
   fontSize: 100,
   lineHeight: 0, // 0 = leave site's own line-height alone
   maxWidthCh: 0, // 0 = leave site's own width alone
@@ -113,7 +113,8 @@ export function normalizeSettings(input: unknown): Settings {
       const profile: SiteProfile = {
         enabled: p.enabled === true,
       }
-      if (typeof p.theme === 'string') profile.theme = oneOf(p.theme, THEME_MODES, 'auto')
+      if (typeof p.theme === 'string')
+        profile.theme = oneOf(p.theme, THEME_MODES, DEFAULT_GLOBAL_SETTINGS.theme)
       if (typeof p.fontSize === 'number') profile.fontSize = clamp(p.fontSize, 80, 200)
       if (typeof p.lineHeight === 'number' && p.lineHeight !== 0)
         profile.lineHeight = clamp(p.lineHeight, 1.0, 2.0)
@@ -130,7 +131,10 @@ export function normalizeSettings(input: unknown): Settings {
   return {
     version: 1,
     global: {
-      theme: typeof global.theme === 'string' ? oneOf(global.theme, THEME_MODES, 'auto') : 'auto',
+      theme:
+        typeof global.theme === 'string'
+          ? oneOf(global.theme, THEME_MODES, DEFAULT_GLOBAL_SETTINGS.theme)
+          : DEFAULT_GLOBAL_SETTINGS.theme,
       fontSize,
       lineHeight,
       maxWidthCh,
