@@ -91,6 +91,8 @@ export const GLARE_TONES: Record<ResolvedGlare, GlareTone> = {
  *   daylight — the software answer to a reflective veil.
  * - Glow removal: box-shadow and text-shadow blanketed away; hairlines
  *   forced dark instead of light.
+ * - Native glare sources: Chrome's pale-blue autofill box is forced black
+ *   with an inset shadow; file-picker buttons get the same tones.
  * - Images (and svg artwork) pulled down to the level's brightness when
  *   dimImages is on.
  *
@@ -112,6 +114,12 @@ export function buildAmoledCss(glare: ResolvedGlare = 'indoor'): string {
     `a{color:${t.link}!important}`,
     // Inputs' caret stays visible on black.
     `input,textarea{caret-color:${t.fg}!important}`,
+    // Chrome/WebKit autofill paints a pale-blue box that survives ordinary
+    // background rules. A huge inset shadow forces it black; the pseudo-class
+    // rule outranks the blanket `*` on specificity.
+    `input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus{box-shadow:0 0 0 1000px #000000 inset!important;-webkit-text-fill-color:${t.fg}!important;caret-color:${t.fg}!important}`,
+    // Native file pickers draw their own button widget.
+    `input::file-selector-button{background-color:#000000!important;color:${t.fg}!important;border-color:${t.hairline}!important}`,
     `::selection{background:${t.selectionBg}!important;color:${t.selectionFg}}`,
   ].join('')
 }
