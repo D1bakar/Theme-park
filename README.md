@@ -31,13 +31,14 @@ Works on Chrome and Brave (any Chromium browser, MV3). Not on Firefox or Safari.
 | Milestone | Scope | State |
 |---|---|---|
 | M0 — infra | repo, CI, releases, website, governance | ✅ done |
-| M1 — core | schema → storage → theme engine → popup + glass mode | ✅ done |
-| Theme packs | browser-chrome themes (Liquid Glass shipped, more planned) | 🚧 partial |
+| M1 — core | schema → storage → theme engine → popup | ✅ done |
+| Product pivot | single theme: AMOLED antireflective (glass gallery retired) | ✅ done |
+| Antireflective | true black, image dimming, anti-flash load | ✅ done |
+| Browser theme pack | dark chrome theme (Liquid Glass assets, optional add-on) | ✅ shipped |
 | M2 — per-site profiles | hostname overrides, options page | planned |
-| M3 — smoothness + readability | animation control, font/width engine polish | planned |
+| M3 — readability polish | font/width engine refinements | planned |
 | M4 — presets + shortcuts | named presets, `commands` API | planned |
-| M5 — more theme packs | remaining packs + in-extension switching | planned |
-| M6 — store | Web Store listing and submission | planned |
+| M5 — store | Web Store listing and submission | planned |
 
 ## Repository layout
 
