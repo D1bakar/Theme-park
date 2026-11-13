@@ -11,8 +11,16 @@
  * on cold navigation. Fix (SW-cached sync read) comes next.
  */
 
+import fontW400 from '@/shared/fonts/inter-400.woff2?inline'
+import fontW500 from '@/shared/fonts/inter-500.woff2?inline'
+import fontW600 from '@/shared/fonts/inter-600.woff2?inline'
 import { getSettingsStore } from '@/shared/storage'
 import { buildThemeCss } from '@/shared/theme-css'
+
+// Inter (OFL) is bundled as data URIs: zero network requests (AGENTS.md),
+// no web_accessible_resources needed. ~72KB total; only the @font-face
+// entries appear in CSS when the user's font mode is 'mac'.
+const FONT_ASSETS = { w400: fontW400, w500: fontW500, w600: fontW600 }
 
 export default defineContentScript({
   matches: ['<all_urls>'],
@@ -23,7 +31,7 @@ export default defineContentScript({
     const apply = async () => {
       try {
         const settings = await getSettingsStore().load()
-        const css = buildThemeCss(settings.global)
+        const css = buildThemeCss(settings.global, FONT_ASSETS)
 
         if (css === null) {
           styleEl?.remove()
