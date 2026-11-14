@@ -44,6 +44,7 @@
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
   --measure: 640px;
   --measure-wide: 1200px;
+  --gutter: 24px;
 }
 
 /* ——— AMOLED theme (always on) ——— */
@@ -71,6 +72,8 @@
 
 html {
   scrollbar-gutter: stable;
+  scroll-behavior: smooth;
+  scroll-padding-top: 72px;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -84,6 +87,7 @@ body {
   display: flex;
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
+  overflow-wrap: break-word;
   transition: color 0.32s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
@@ -97,7 +101,7 @@ main {
   width: 100%;
   max-width: var(--measure);
   margin: 0 auto;
-  padding: 78px 24px 52px;
+  padding: 80px var(--gutter) 60px;
   position: relative;
   z-index: 1;
 }
@@ -158,8 +162,10 @@ a {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 11px 40px;
+  padding-block: 11px;
+  padding-inline: max(var(--gutter), calc((100% - var(--measure)) / 2 + var(--gutter)));
   background: var(--bg);
+  border-bottom: 1px solid var(--border);
   transition: background-color 0.32s cubic-bezier(0.32, 0.72, 0, 1);
 }
 .header-logo {
@@ -181,6 +187,7 @@ a {
   color: var(--text-tertiary);
   font-size: 13.5px;
   font-weight: 500;
+  white-space: nowrap;
 }
 .header-links a:hover {
   color: var(--text);
@@ -199,8 +206,10 @@ a {
   margin-bottom: 10px;
 }
 .hero h1 {
-  font-size: 3.4rem;
-  margin-bottom: 10px;
+  font-size: clamp(2.35rem, 1.95rem + 2vw, 3.4rem);
+  line-height: 1.05;
+  margin-bottom: 12px;
+  text-wrap: balance;
 }
 .hero-tagline {
   font-size: 16.5px;
@@ -217,6 +226,7 @@ a {
 .btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   border-radius: 999px;
   padding: 11px 22px;
@@ -224,6 +234,7 @@ a {
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
+  white-space: nowrap;
   transition:
     opacity var(--transition),
     background var(--transition),
@@ -308,6 +319,28 @@ a {
   margin-bottom: 0;
 }
 
+/* ——— interior pages (privacy) ——— */
+.page-title {
+  font-size: clamp(2rem, 1.7rem + 1.1vw, 2.4rem);
+  margin-bottom: 8px;
+  text-wrap: balance;
+}
+.page-meta {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin-bottom: 24px;
+}
+.card--prose {
+  padding: 26px 28px;
+}
+.card--prose p {
+  font-size: 15.5px;
+  margin-bottom: 16px;
+}
+.card--prose p:last-child {
+  margin-bottom: 0;
+}
+
 /* ——— install steps ——— */
 .steps {
   counter-reset: step;
@@ -349,6 +382,20 @@ a {
   padding: 0.06em 0.34em;
 }
 
+/* ——— known limits list ——— */
+.limits {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin: 0;
+  padding-left: 20px;
+}
+.limits li {
+  margin-bottom: 8px;
+}
+.limits li:last-child {
+  margin-bottom: 0;
+}
+
 /* ——— glare level cards ——— */
 .glare-card {
   background: var(--bg-card);
@@ -380,6 +427,62 @@ a {
   margin-bottom: 12px;
 }
 
+/* ——— footer dock ——— */
+.site-footer {
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
+  padding: 26px var(--gutter) 30px;
+}
+.dock {
+  max-width: var(--measure);
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 8px 20px;
+  background: var(--bg-card);
+}
+.dock-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.dock a {
+  color: var(--text-secondary);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    color 0.2s,
+    background-color 0.2s;
+}
+.dock a:hover {
+  color: var(--text);
+  background: var(--hover-bg);
+}
+.dock-credit {
+  flex-shrink: 0;
+  margin-bottom: 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--text-tertiary);
+  font-size: 13.5px;
+  white-space: nowrap;
+}
+.dock-credit a {
+  color: var(--text-secondary);
+}
+.dock-credit a:hover {
+  color: var(--text);
+}
+
 /* ——— reduced motion: honor it everywhere (AGENTS.md) ——— */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -393,18 +496,85 @@ a {
   }
 }
 
+/* ——— tablet: stack the dock before it gets tight ——— */
+@media (width <= 720px) {
+  .site-footer {
+    padding: 22px var(--gutter) 26px;
+  }
+  .dock {
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 18px;
+    border-radius: 18px;
+  }
+  .dock-links {
+    justify-content: center;
+  }
+}
+
+/* ——— phone: header becomes an in-flow two-row bar ——— */
 @media (width <= 640px) {
-  main {
-    padding: 66px 20px 40px;
+  :root {
+    --gutter: 20px;
+  }
+  html {
+    scroll-padding-top: 20px;
   }
   .site-header {
-    padding: 9px 20px;
+    position: static;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    padding: 12px var(--gutter);
   }
-  .hero h1 {
-    font-size: 2.5rem;
+  .header-links {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px 6px;
+  }
+  .header-links a {
+    font-size: 13px;
+  }
+  main {
+    padding: 24px var(--gutter) 48px;
+  }
+  .hero {
+    padding-top: 20px;
+  }
+  .section-label {
+    margin-top: 34px;
   }
   .grid-3,
   .grid-2 {
     grid-template-columns: minmax(0, 1fr);
+  }
+  .cta-row {
+    gap: 10px;
+  }
+}
+
+/* ——— small phone: full-width CTAs, tighter cards ——— */
+@media (width <= 420px) {
+  .cta-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .cta-row .btn {
+    width: 100%;
+  }
+  .card--prose {
+    padding: 20px 18px;
+  }
+  .site-footer {
+    padding: 18px var(--gutter) 22px;
+  }
+  .dock {
+    padding: 12px 14px;
+  }
+  .dock-links {
+    gap: 2px;
+  }
+  .dock a {
+    padding: 5px 8px;
   }
 }
