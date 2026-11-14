@@ -27,7 +27,7 @@ import Base from '../layouts/Base.astro';
     </p>
   </div>
 
-  <div class="section-label">How it works</div>
+  <div id="features" class="section-label">How it works</div>
   <div class="grid-2">
     <div class="card">
       <h3>AMOLED antireflective</h3>
@@ -109,17 +109,17 @@ import Base from '../layouts/Base.astro';
     <p>
       ThemePark is software-only: it maximizes legibility through external-light reflections, but it cannot remove physical reflections or apply a matte coating. Known limitations:
     </p>
-    <ul style="color: var(--text-secondary); font-size: 14px; margin-left: 20px; margin-bottom: 0;">
-      <li style="margin-bottom: 8px;">
+    <ul class="limits">
+      <li>
         <strong>Photos via background-image</strong> — CSS has no selector for "element that has one", so photos painted this way stay full-bright. Gradient-only backgrounds are neutralised.
       </li>
-      <li style="margin-bottom: 8px;">
+      <li>
         <strong>Closed shadow DOM</strong> — styles inside shadow trees are not reachable.
       </li>
-      <li style="margin-bottom: 8px;">
+      <li>
         <strong>Video and canvas</strong> — these are rendered by the page, not by CSS.
       </li>
-      <li style="margin-bottom: 8px;">
+      <li>
         <strong>Chrome:// pages, PDF viewer, and other restricted pages</strong> — these are out of scope for this extension.
       </li>
     </ul>
